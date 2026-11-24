@@ -8,7 +8,7 @@
 <style>
 :root{--green:#2e7d32;--dark:#1b5e20;--bg:#f3f6f3;--red:#c62828;--blue:#1565c0}
 *{box-sizing:border-box}
-body{margin:0;padding:14px;padding-bottom:35px;font-family:Arial,sans-serif;background:var(--bg);color:#222}
+body{margin:0;padding:14px 14px 35px;font-family:Arial,sans-serif;background:var(--bg);color:#222}
 header{background:var(--green);color:white;padding:18px 12px;text-align:center;border-radius:12px;margin-bottom:14px}
 header h2{margin:0;font-size:21px}
 header p{margin:7px 0 0;font-size:13px}
@@ -58,18 +58,13 @@ button{cursor:pointer}
 <form id="form-trung" onsubmit="saveRecord(event,'trung')">
 <label>Ngày đẻ của quả trứng</label>
 <input type="date" name="ngay" required>
-
 <label>Mã tổ</label>
 <input type="number" name="maTo" min="1" max="1800" placeholder="Nhập mã tổ" required>
-
 <label>Ảnh đính kèm (nếu có)</label>
 <input type="file" name="anh" accept="image/*" multiple>
-
 <label>Ghi chú</label>
 <textarea name="ghiChu" placeholder="Nhập ghi chú nếu có"></textarea>
-
 <p class="hint">Mỗi lần lưu là một quả trứng. Nếu một tổ có 2 quả đẻ khác ngày, hãy nhập thành 2 lần riêng biệt.</p>
-
 <button class="save" type="submit" id="saveBtn-trung">Lưu quả trứng</button>
 <button class="cancel" type="button" onclick="cancelEdit('trung')" id="cancelBtn-trung" style="display:none">Hủy sửa</button>
 </form>
@@ -212,7 +207,6 @@ function validNest(v){
  const n=Number(v);
  return Number.isInteger(n)&&n>=1&&n<=1800;
 }
-
 function saveRecord(event,type){
  event.preventDefault();
  const form=document.getElementById("form-"+type);
@@ -238,10 +232,7 @@ function saveRecord(event,type){
   data.toCu=Number(data.toCu);
   data.toMoi=Number(data.toMoi);
  }
- if(type==="trung"){
-  // Bản ghi mới luôn đại diện cho đúng một quả trứng.
-  data.soTrung=1;
- }
+ if(type==="trung")data.soTrung=1;
  if(type==="toAp"){
   data.soToNgay=Number(data.soToNgay);
   data.tongTo=Number(data.tongTo);
@@ -252,9 +243,7 @@ function saveRecord(event,type){
  if(index!==null){
   const old=db[type][index];
   if(!data.soAnh&&old.soAnh)data.soAnh=old.soAnh;
-  if(type==="trung"&&Number(old.soTrung||1)>1){
-   data.soTrung=old.soTrung;
-  }
+  if(type==="trung"&&Number(old.soTrung||1)>1)data.soTrung=old.soTrung;
   data.id=old.id;
   db[type][index]=data;
  }else{
@@ -262,31 +251,26 @@ function saveRecord(event,type){
   data.createdAt=new Date().toISOString();
   db[type].unshift(data);
  }
-
  if(!saveDB())return;
  alert(index!==null?"Đã cập nhật thông tin.":"Đã lưu thông tin.");
  cancelEdit(type);
  renderAll();
 }
-
 function editRecord(type,index){
  const r=db[type][index];
  if(!r)return;
  const form=document.getElementById("form-"+type);
  form.reset();
-
  Object.keys(r).forEach(key=>{
   const field=form.elements.namedItem(key);
   if(field&&field.type!=="file")field.value=r[key]??"";
  });
-
  editing[type]=index;
  document.getElementById("editMsg-"+type).style.display="block";
- document.getElementById("saveBtn-"+type).textContent="Cập nhật thông tin";
+ document.getElementById("saveBtn-"+type).textContent=type==="trung"?"Cập nhật quả trứng":"Cập nhật thông tin";
  document.getElementById("cancelBtn-"+type).style.display="block";
  document.getElementById(type).scrollIntoView({behavior:"smooth",block:"start"});
 }
-
 function cancelEdit(type){
  const form=document.getElementById("form-"+type);
  form.reset();
@@ -297,7 +281,6 @@ function cancelEdit(type){
  document.getElementById("saveBtn-"+type).textContent=type==="trung"?"Lưu quả trứng":"Lưu thông tin";
  document.getElementById("cancelBtn-"+type).style.display="none";
 }
-
 function deleteRecord(type,index){
  if(!confirm("Bạn có chắc chắn muốn xóa bản ghi này không?"))return;
  db[type].splice(index,1);
@@ -306,7 +289,6 @@ function deleteRecord(type,index){
  else if(editing[type]!==null&&editing[type]>index)editing[type]--;
  renderAll();
 }
-
 function recordHTML(type,r,index){
  let content="";
  if(type==="trung"){
@@ -351,7 +333,6 @@ function recordHTML(type,r,index){
   </div>
  </div>`;
 }
-
 function renderList(type){
  const box=document.getElementById("list-"+type);
  if(!db[type].length){
