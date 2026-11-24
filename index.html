@@ -3,394 +3,602 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trại Chim Của Thảo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>App Trại Chim Của Thảo</title>
 <style>
-:root{--green:#247b43;--dark:#155c31;--bg:#f3f6f3;--red:#c62828;--blue:#1565c0}
+:root{
+  --green:#2e7d32;
+  --dark:#1b5e20;
+  --bg:#f3f6f3;
+  --red:#c62828;
+  --blue:#1565c0;
+  --orange:#ef6c00;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:#26332a}
-header{background:var(--green);color:white;padding:20px 15px;text-align:center}
-header h2{margin:0 0 6px;font-size:22px}
-header p{margin:0;font-size:13px}
-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;background:white;position:sticky;top:0;z-index:5}
-nav button{border:0;border-radius:9px;padding:12px 5px;background:#e8eee9;color:#285b38;font-weight:bold}
-nav button.active{background:var(--green);color:white}
-main{padding:12px;max-width:700px;margin:auto}
-.panel{display:none}
+body{
+  margin:0;
+  padding:14px;
+  padding-bottom:35px;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:#222;
+}
+header{
+  background:var(--green);
+  color:white;
+  padding:18px 12px;
+  text-align:center;
+  border-radius:12px;
+  margin-bottom:14px;
+}
+header h2{margin:0;font-size:21px}
+header p{margin:7px 0 0;font-size:13px}
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:14px;
+}
+.tab{
+  border:0;
+  padding:13px 6px;
+  border-radius:9px;
+  background:#dce8dc;
+  color:var(--dark);
+  font-size:14px;
+  font-weight:bold;
+}
+.tab.active{
+  background:var(--green);
+  color:white;
+}
+.panel{
+  display:none;
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 2px 8px #0000000d;
+  margin-bottom:14px;
+}
 .panel.active{display:block}
-.card{background:white;padding:15px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 7px #0000000b}
-h3{margin:0 0 14px;color:var(--dark);font-size:18px}
-label{display:block;font-weight:bold;font-size:14px;margin:12px 0 6px}
-input,select,textarea{width:100%;padding:12px;border:1px solid #ccd5ce;border-radius:8px;font-size:16px;background:white}
-textarea{min-height:65px}
-button.save{width:100%;border:0;background:var(--green);color:white;padding:14px;border-radius:9px;font-size:16px;font-weight:bold;margin-top:15px}
-button.danger{background:var(--red)}
-button.small{border:0;border-radius:7px;padding:7px 10px;background:#e8eee9;color:#245c35}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.stat{background:#edf5ef;padding:13px;border-radius:9px;text-align:center}
-.stat strong{display:block;font-size:23px;color:var(--green);margin-bottom:5px}
-.muted{color:#68766c;font-size:13px}
-.item{padding:11px 0;border-bottom:1px solid #e8ece8;line-height:1.6}
-.item:last-child{border:0}
-.empty{text-align:center;color:#879187;padding:20px}
-footer{text-align:center;padding:20px;color:#89928a;font-size:12px}
+h3{
+  color:var(--dark);
+  margin:0 0 14px;
+  font-size:18px;
+}
+label{
+  display:block;
+  font-size:14px;
+  font-weight:bold;
+  margin:12px 0 6px;
+}
+input,select,textarea{
+  display:block;
+  width:100%;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  background:white;
+  font-size:16px;
+}
+textarea{min-height:65px;resize:vertical}
+button{cursor:pointer}
+.save{
+  width:100%;
+  border:0;
+  border-radius:8px;
+  padding:13px;
+  background:var(--green);
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  margin-top:15px;
+}
+.cancel{
+  width:100%;
+  border:0;
+  border-radius:8px;
+  padding:11px;
+  background:#777;
+  color:white;
+  font-size:15px;
+  margin-top:8px;
+}
+.list-title{
+  margin:20px 0 10px;
+  color:var(--dark);
+  font-size:17px;
+  font-weight:bold;
+}
+.record{
+  border:1px solid #ddd;
+  border-radius:9px;
+  padding:12px;
+  margin:9px 0;
+  background:#fff;
+  overflow-wrap:anywhere;
+}
+.record strong{color:var(--dark)}
+.record p{margin:6px 0;font-size:14px;line-height:1.5}
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.actions button{
+  flex:1;
+  border:0;
+  border-radius:7px;
+  padding:10px;
+  color:white;
+  font-size:14px;
+  font-weight:bold;
+}
+.edit{background:var(--blue)}
+.delete{background:var(--red)}
+.empty{
+  color:#777;
+  text-align:center;
+  padding:15px 5px;
+  font-size:14px;
+}
+.note{
+  font-size:12px;
+  color:#666;
+  line-height:1.5;
+  margin-top:10px;
+}
+.editing{
+  background:#fff4df;
+  border:1px solid #f0c36d;
+  border-radius:8px;
+  padding:10px;
+  margin-bottom:10px;
+  color:#8a4b00;
+  font-weight:bold;
+  display:none;
+}
 </style>
 </head>
 <body>
 
 <header>
-<h2>TRẠI CHIM CỦA THẢO</h2>
-<p>Ứng dụng ghi nhận công việc tại trại chim</p>
+  <h2>APP TRẠI CHIM CỦA THẢO</h2>
+  <p>Ghi chép công việc hằng ngày</p>
 </header>
 
-<nav>
-<button class="active" onclick="showTab('eggs',this)">🥚 Theo dõi trứng</button>
-<button onclick="showTab('incubation',this)">🪺 Tổ ấp</button>
-<button onclick="showTab('transfer',this)">🔄 Chuyển tổ</button>
-<button onclick="showTab('babies',this)">🐣 Chim con</button>
-</nav>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('trung',this)">🥚 Trứng</button>
+  <button class="tab" onclick="showTab('toAp',this)">🐣 Tổ ấp</button>
+  <button class="tab" onclick="showTab('chuyenTo',this)">🔄 Chuyển tổ</button>
+  <button class="tab" onclick="showTab('chimCon',this)">🐥 Chim con chết</button>
+</div>
 
-<main>
+<!-- MỤC TRỨNG -->
+<section class="panel active" id="trung">
+  <h3>🥚 Ghi nhận trứng</h3>
+  <div class="editing" id="editMsg-trung">Đang sửa bản ghi</div>
 
-<section id="eggs" class="panel active">
-<div class="card">
-<h3>Ghi nhận trứng nhặt được</h3>
-<form id="eggForm">
-<label>Ngày nhặt trứng</label>
-<input type="date" id="eggDate" required>
-<label>Mã tổ</label>
-<input type="number" id="eggNest" min="1" max="1800" placeholder="Ví dụ: 25" required>
-<label>Số trứng</label>
-<input type="number" id="eggCount" min="1" placeholder="Nhập số trứng" required>
-<label>Ảnh trứng (có thể chọn nhiều ảnh)</label>
-<input type="file" id="eggImages" accept="image/*" multiple>
-<p class="muted">Bản thử nghiệm chỉ ghi nhận số ảnh đã chọn, chưa tải ảnh lên máy chủ.</p>
-<label>Ghi chú</label>
-<textarea id="eggNote" placeholder="Thông tin thêm nếu có"></textarea>
-<button class="save">LƯU TRỨNG</button>
-</form>
-</div>
-<div class="card">
-<h3>Thống kê trứng</h3>
-<div class="stats">
-<div class="stat"><strong id="eggTotal">0</strong><span>Tổng số trứng</span></div>
-<div class="stat"><strong id="eggTransactions">0</strong><span>Lần nhặt</span></div>
-</div>
-</div>
-<div class="card">
-<h3>Lịch sử nhặt trứng</h3>
-<div id="eggHistory"></div>
-</div>
+  <form id="form-trung" onsubmit="saveRecord(event,'trung')">
+    <label>Ngày ghi nhận</label>
+    <input type="date" name="ngay" required>
+
+    <label>Mã tổ</label>
+    <input type="number" name="maTo" min="1" max="1800" placeholder="Nhập mã tổ" required>
+
+    <label>Số lượng trứng</label>
+    <input type="number" name="soTrung" min="1" step="1" placeholder="Nhập số trứng" required>
+
+    <label>Số ảnh đính kèm</label>
+    <input type="file" name="anh" accept="image/*" multiple>
+
+    <label>Ghi chú</label>
+    <textarea name="ghiChu" placeholder="Nhập ghi chú nếu có"></textarea>
+
+    <button class="save" type="submit" id="saveBtn-trung">Lưu thông tin</button>
+    <button class="cancel" type="button" onclick="cancelEdit('trung')" id="cancelBtn-trung" style="display:none">Hủy sửa</button>
+  </form>
+
+  <div class="list-title">Danh sách trứng đã ghi</div>
+  <div id="list-trung"></div>
 </section>
 
-<section id="incubation" class="panel">
-<div class="card">
-<h3>Ghi nhận tổ ấp trong ngày</h3>
-<form id="incForm">
-<label>Ngày ghi nhận</label>
-<input type="date" id="incDate" required>
-<label>Số tổ ấp trong ngày</label>
-<input type="number" id="incToday" min="0" placeholder="Nhập số tổ" required>
-<label>Tổng số tổ ấp</label>
-<input type="number" id="incTotal" min="0" placeholder="Nhập tổng số tổ" required>
-<label>Ghi chú</label>
-<textarea id="incNote"></textarea>
-<button class="save">LƯU SỐ LIỆU</button>
-</form>
-</div>
-<div class="card">
-<h3>Thống kê tổ ấp</h3>
-<div id="incStats"></div>
-</div>
-<div class="card">
-<h3>Lịch sử tổ ấp</h3>
-<div id="incHistory"></div>
-</div>
+<!-- MỤC TỔ ẤP -->
+<section class="panel" id="toAp">
+  <h3>🐣 Ghi nhận tổ ấp</h3>
+  <div class="editing" id="editMsg-toAp">Đang sửa bản ghi</div>
+
+  <form id="form-toAp" onsubmit="saveRecord(event,'toAp')">
+    <label>Ngày ghi nhận</label>
+    <input type="date" name="ngay" required>
+
+    <label>Số tổ ấp trong ngày</label>
+    <input type="number" name="soToNgay" min="1" step="1" placeholder="Nhập số tổ ấp trong ngày" required>
+
+    <label>Tổng số tổ ấp</label>
+    <input type="number" name="tongTo" min="1" step="1" placeholder="Nhập tổng số tổ ấp" required>
+
+    <label>Ghi chú</label>
+    <textarea name="ghiChu" placeholder="Nhập ghi chú nếu có"></textarea>
+
+    <button class="save" type="submit" id="saveBtn-toAp">Lưu thông tin</button>
+    <button class="cancel" type="button" onclick="cancelEdit('toAp')" id="cancelBtn-toAp" style="display:none">Hủy sửa</button>
+  </form>
+
+  <div class="list-title">Danh sách tổ ấp đã ghi</div>
+  <div id="list-toAp"></div>
 </section>
 
-<section id="transfer" class="panel">
-<div class="card">
-<h3>Ghi nhận chuyển tổ chim</h3>
-<form id="transferForm">
-<label>Ngày chuyển</label>
-<input type="date" id="transferDate" required>
-<label>Mã tổ cũ</label>
-<input type="number" id="oldNest" min="1" max="1800" required>
-<label>Mã tổ mới</label>
-<input type="number" id="newNest" min="1" max="1800" required>
-<label>Số lượng chim chuyển</label>
-<input type="number" id="transferCount" min="1" required>
-<label>Người thực hiện</label>
-<input type="text" id="transferPerson" placeholder="Tên nhân viên">
-<label>Lý do chuyển tổ</label>
-<textarea id="transferNote"></textarea>
-<button class="save">LƯU CHUYỂN TỔ</button>
-</form>
-</div>
-<div class="card">
-<h3>Thống kê chuyển tổ</h3>
-<div class="stats">
-<div class="stat"><strong id="transferTotal">0</strong><span>Lượt chuyển</span></div>
-<div class="stat"><strong id="transferBirds">0</strong><span>Số chim chuyển</span></div>
-</div>
-</div>
-<div class="card">
-<h3>Lịch sử chuyển tổ</h3>
-<div id="transferHistory"></div>
-</div>
+<!-- MỤC CHUYỂN TỔ -->
+<section class="panel" id="chuyenTo">
+  <h3>🔄 Ghi nhận chuyển tổ</h3>
+  <div class="editing" id="editMsg-chuyenTo">Đang sửa bản ghi</div>
+
+  <form id="form-chuyenTo" onsubmit="saveRecord(event,'chuyenTo')">
+    <label>Ngày chuyển</label>
+    <input type="date" name="ngay" required>
+
+    <label>Mã tổ cũ</label>
+    <input type="number" name="toCu" min="1" max="1800" placeholder="Mã tổ cũ" required>
+
+    <label>Mã tổ mới</label>
+    <input type="number" name="toMoi" min="1" max="1800" placeholder="Mã tổ mới" required>
+
+    <label>Số lượng chim</label>
+    <input type="number" name="soChim" min="1" step="1" placeholder="Nhập số lượng chim" required>
+
+    <label>Người thực hiện</label>
+    <input type="text" name="nguoi" placeholder="Tên người thực hiện">
+
+    <label>Lý do chuyển</label>
+    <textarea name="lyDo" placeholder="Nhập lý do chuyển tổ"></textarea>
+
+    <button class="save" type="submit" id="saveBtn-chuyenTo">Lưu thông tin</button>
+    <button class="cancel" type="button" onclick="cancelEdit('chuyenTo')" id="cancelBtn-chuyenTo" style="display:none">Hủy sửa</button>
+  </form>
+
+  <div class="list-title">Danh sách chuyển tổ đã ghi</div>
+  <div id="list-chuyenTo"></div>
 </section>
 
-<section id="babies" class="panel">
-<div class="card">
-<h3>Ghi nhận chim con chết</h3>
-<form id="babyForm">
-<label>Ngày ghi nhận</label>
-<input type="date" id="babyDate" required>
-<label>Mã tổ</label>
-<input type="number" id="babyNest" min="1" max="1800" required>
-<label>Số chim con chết</label>
-<input type="number" id="babyCount" min="1" required>
-<label>Nguyên nhân</label>
-<select id="babyReason">
-<option>Không xác định</option>
-<option>Chim bố mẹ không nuôi</option>
-<option>Thiếu thức ăn</option>
-<option>Chim con yếu</option>
-<option>Tai nạn / bị thương</option>
-<option>Khác</option>
-</select>
-<label>Ghi chú nguyên nhân khác (nếu có)</label>
-<textarea id="babyNote"></textarea>
-<label>Ảnh minh chứng</label>
-<input type="file" id="babyImages" accept="image/*" multiple>
-<p class="muted">Bản thử nghiệm chưa tải ảnh lên máy chủ.</p>
-<button class="save">LƯU SỐ LIỆU</button>
-</form>
-</div>
-<div class="card">
-<h3>Thống kê chim con</h3>
-<div class="stats">
-<div class="stat"><strong id="babyTotal">0</strong><span>Tổng chim con chết</span></div>
-<div class="stat"><strong id="babyNests">0</strong><span>Số tổ có ghi nhận</span></div>
-</div>
-</div>
-<div class="card">
-<h3>Lịch sử chim con</h3>
-<div id="babyHistory"></div>
-</div>
+<!-- MỤC CHIM CON -->
+<section class="panel" id="chimCon">
+  <h3>🐥 Ghi nhận chim con chết</h3>
+  <div class="editing" id="editMsg-chimCon">Đang sửa bản ghi</div>
+
+  <form id="form-chimCon" onsubmit="saveRecord(event,'chimCon')">
+    <label>Ngày ghi nhận</label>
+    <input type="date" name="ngay" required>
+
+    <label>Mã tổ</label>
+    <input type="number" name="maTo" min="1" max="1800" placeholder="Nhập mã tổ" required>
+
+    <label>Số chim chết</label>
+    <input type="number" name="soChet" min="1" step="1" placeholder="Nhập số chim chết" required>
+
+    <label>Nguyên nhân</label>
+    <select name="nguyenNhan">
+      <option value="">-- Chọn nguyên nhân --</option>
+      <option>Yếu</option>
+      <option>Bệnh</option>
+      <option>Bị thương</option>
+      <option>Không rõ nguyên nhân</option>
+      <option>Nguyên nhân khác</option>
+    </select>
+
+    <label>Số ảnh đính kèm</label>
+    <input type="file" name="anh" accept="image/*" multiple>
+
+    <label>Ghi chú</label>
+    <textarea name="ghiChu" placeholder="Nhập ghi chú nếu có"></textarea>
+
+    <button class="save" type="submit" id="saveBtn-chimCon">Lưu thông tin</button>
+    <button class="cancel" type="button" onclick="cancelEdit('chimCon')" id="cancelBtn-chimCon" style="display:none">Hủy sửa</button>
+  </form>
+
+  <div class="list-title">Danh sách chim con chết đã ghi</div>
+  <div id="list-chimCon"></div>
 </section>
 
-<div class="card">
-<h3>Tra cứu theo mã tổ</h3>
-<label>Nhập mã tổ cần tra cứu</label>
-<input type="number" id="searchNest" min="1" max="1800" placeholder="Ví dụ: 25">
-<button class="save" onclick="searchNest()">TRA CỨU</button>
-<div id="searchResult"></div>
-</div>
-
-</main>
-
-<footer>Trại Chim Của Thảo · Bản thử nghiệm</footer>
+<p class="note">
+  Dữ liệu hiện được lưu trên trình duyệt của thiết bị đang sử dụng.
+  Số ảnh chỉ được ghi nhận, chưa tải ảnh lên máy chủ.
+</p>
 
 <script>
-const KEY="thaoBirdFarmDemoV1";
-let db={eggs:[],incubations:[],transfers:[],babies:[]};
+const STORAGE_KEY = "thaoBirdFarmDemoV1";
 
-try{
-const saved=localStorage.getItem(KEY);
-if(saved){
-const parsed=JSON.parse(saved);
-db={...db,...parsed};
-}
-}catch(e){console.log(e)}
+const TYPES = ["trung","toAp","chuyenTo","chimCon"];
 
-function saveDB(){
-localStorage.setItem(KEY,JSON.stringify(db));
-render();
-}
+let db = {
+  trung: [],
+  toAp: [],
+  chuyenTo: [],
+  chimCon: []
+};
 
-function padNest(n){
-n=Number(n);
-return n<1000?String(n).padStart(3,"0"):String(n);
-}
+let editing = {
+  trung: null,
+  toAp: null,
+  chuyenTo: null,
+  chimCon: null
+};
 
 function today(){
-return new Date().toLocaleDateString("en-CA");
+  const d = new Date();
+  const offset = d.getTimezoneOffset();
+  return new Date(d.getTime() - offset * 60000)
+    .toISOString().slice(0,10);
 }
 
-function showTab(id,btn){
-document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
-btn.classList.add("active");
+function formatDate(value){
+  if(!value) return "";
+  const p = value.split("-");
+  if(p.length !== 3) return value;
+  return p[2] + "/" + p[1] + "/" + p[0];
 }
 
-function value(id){
-return document.getElementById(id).value.trim();
+function formatNest(value){
+  const n = Number(value);
+  if(!Number.isFinite(n)) return value || "";
+  return n < 1000 ? String(n).padStart(3,"0") : String(n);
 }
 
-function number(id){
-return Number(value(id));
+function loadDB(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const data = JSON.parse(saved);
+      TYPES.forEach(type=>{
+        if(Array.isArray(data[type])) db[type] = data[type];
+      });
+    }
+  }catch(error){
+    alert("Không đọc được dữ liệu đã lưu trên thiết bị.");
+  }
 }
 
-function fileCount(id){
-return document.getElementById(id).files.length;
+function saveDB(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+    return true;
+  }catch(error){
+    alert("Không thể lưu dữ liệu. Bộ nhớ trình duyệt có thể đã đầy.");
+    return false;
+  }
 }
 
-document.querySelectorAll('input[type="date"]').forEach(x=>x.value=today());
+function showTab(id,button){
+  document.querySelectorAll(".panel").forEach(panel=>{
+    panel.classList.remove("active");
+  });
+  document.querySelectorAll(".tab").forEach(tab=>{
+    tab.classList.remove("active");
+  });
+  document.getElementById(id).classList.add("active");
+  button.classList.add("active");
+}
 
-document.getElementById("eggForm").onsubmit=e=>{
-e.preventDefault();
-db.eggs.push({
-id:Date.now(),date:value("eggDate"),
-nest:number("eggNest"),count:number("eggCount"),
-images:fileCount("eggImages"),note:value("eggNote")
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g,char=>{
+    return {
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[char];
+  });
+}
+
+function getFormData(form){
+  const data = {};
+  new FormData(form).forEach((value,key)=>{
+    if(key !== "anh") data[key] = value;
+  });
+
+  const fileInput = form.elements.namedItem("anh");
+  if(fileInput){
+    data.soAnh = fileInput.files ? fileInput.files.length : 0;
+  }
+  return data;
+}
+
+function validateNest(value){
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1 && n <= 1800;
+}
+
+function saveRecord(event,type){
+  event.preventDefault();
+
+  const form = document.getElementById("form-" + type);
+  const data = getFormData(form);
+  const index = editing[type];
+
+  if(type === "trung" || type === "chimCon"){
+    if(!validateNest(data.maTo)){
+      alert("Mã tổ phải từ 1 đến 1800.");
+      return;
+    }
+    data.maTo = Number(data.maTo);
+  }
+
+  if(type === "chuyenTo"){
+    if(!validateNest(data.toCu) || !validateNest(data.toMoi)){
+      alert("Mã tổ phải từ 1 đến 1800.");
+      return;
+    }
+    if(Number(data.toCu) === Number(data.toMoi)){
+      alert("Mã tổ cũ và mã tổ mới không được giống nhau.");
+      return;
+    }
+    data.toCu = Number(data.toCu);
+    data.toMoi = Number(data.toMoi);
+  }
+
+  if(type === "trung") data.soTrung = Number(data.soTrung);
+  if(type === "toAp"){
+    data.soToNgay = Number(data.soToNgay);
+    data.tongTo = Number(data.tongTo);
+  }
+  if(type === "chuyenTo") data.soChim = Number(data.soChim);
+  if(type === "chimCon") data.soChet = Number(data.soChet);
+
+  if(index !== null){
+    const old = db[type][index];
+    if(!data.soAnh && old && old.soAnh){
+      data.soAnh = old.soAnh;
+    }
+    data.id = old.id;
+    db[type][index] = data;
+  }else{
+    data.id = Date.now().toString() + Math.random().toString(16).slice(2);
+    data.createdAt = new Date().toISOString();
+    db[type].unshift(data);
+  }
+
+  if(!saveDB()) return;
+
+  alert(index !== null ? "Đã cập nhật thông tin." : "Đã lưu thông tin.");
+  cancelEdit(type);
+  renderAll();
+}
+
+function editRecord(type,index){
+  const record = db[type][index];
+  if(!record) return;
+
+  const form = document.getElementById("form-" + type);
+  form.reset();
+
+  Object.keys(record).forEach(key=>{
+    const field = form.elements.namedItem(key);
+    if(field && field.type !== "file"){
+      field.value = record[key] ?? "";
+    }
+  });
+
+  editing[type] = index;
+  document.getElementById("editMsg-" + type).style.display = "block";
+  document.getElementById("saveBtn-" + type).textContent = "Cập nhật thông tin";
+  document.getElementById("cancelBtn-" + type).style.display = "block";
+
+  document.getElementById(type).scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+}
+
+function cancelEdit(type){
+  const form = document.getElementById("form-" + type);
+  form.reset();
+
+  const dateField = form.elements.namedItem("ngay");
+  if(dateField) dateField.value = today();
+
+  editing[type] = null;
+  document.getElementById("editMsg-" + type).style.display = "none";
+  document.getElementById("saveBtn-" + type).textContent = "Lưu thông tin";
+  document.getElementById("cancelBtn-" + type).style.display = "none";
+}
+
+function deleteRecord(type,index){
+  if(!confirm("Bạn có chắc chắn muốn xóa bản ghi này không?")) return;
+
+  db[type].splice(index,1);
+  if(!saveDB()) return;
+
+  if(editing[type] === index){
+    cancelEdit(type);
+  }else if(editing[type] !== null && editing[type] > index){
+    editing[type]--;
+  }
+
+  renderAll();
+}
+
+function recordHTML(type,r,index){
+  let content = "";
+
+  if(type === "trung"){
+    content = `
+      <p><strong>Ngày:</strong> ${formatDate(r.ngay)}</p>
+      <p><strong>Mã tổ:</strong> ${formatNest(r.maTo)}</p>
+      <p><strong>Số trứng:</strong> ${escapeHTML(r.soTrung)}</p>
+      <p><strong>Số ảnh:</strong> ${escapeHTML(r.soAnh || 0)}</p>
+      <p><strong>Ghi chú:</strong> ${escapeHTML(r.ghiChu || "Không có")}</p>`;
+  }
+
+  if(type === "toAp"){
+    content = `
+      <p><strong>Ngày:</strong> ${formatDate(r.ngay)}</p>
+      <p><strong>Số tổ ấp trong ngày:</strong> ${escapeHTML(r.soToNgay)}</p>
+      <p><strong>Tổng số tổ ấp:</strong> ${escapeHTML(r.tongTo)}</p>
+      <p><strong>Ghi chú:</strong> ${escapeHTML(r.ghiChu || "Không có")}</p>`;
+  }
+
+  if(type === "chuyenTo"){
+    content = `
+      <p><strong>Ngày:</strong> ${formatDate(r.ngay)}</p>
+      <p><strong>Tổ cũ:</strong> ${formatNest(r.toCu)}</p>
+      <p><strong>Tổ mới:</strong> ${formatNest(r.toMoi)}</p>
+      <p><strong>Số lượng chim:</strong> ${escapeHTML(r.soChim)}</p>
+      <p><strong>Người thực hiện:</strong> ${escapeHTML(r.nguoi || "Chưa ghi")}</p>
+      <p><strong>Lý do:</strong> ${escapeHTML(r.lyDo || "Không có")}</p>`;
+  }
+
+  if(type === "chimCon"){
+    content = `
+      <p><strong>Ngày:</strong> ${formatDate(r.ngay)}</p>
+      <p><strong>Mã tổ:</strong> ${formatNest(r.maTo)}</p>
+      <p><strong>Số chim chết:</strong> ${escapeHTML(r.soChet)}</p>
+      <p><strong>Nguyên nhân:</strong> ${escapeHTML(r.nguyenNhan || "Chưa ghi")}</p>
+      <p><strong>Số ảnh:</strong> ${escapeHTML(r.soAnh || 0)}</p>
+      <p><strong>Ghi chú:</strong> ${escapeHTML(r.ghiChu || "Không có")}</p>`;
+  }
+
+  return `
+    <div class="record">
+      ${content}
+      <div class="actions">
+        <button class="edit" type="button"
+          onclick="editRecord('${type}',${index})">Sửa</button>
+        <button class="delete" type="button"
+          onclick="deleteRecord('${type}',${index})">Xóa</button>
+      </div>
+    </div>`;
+}
+
+function renderList(type){
+  const container = document.getElementById("list-" + type);
+  const records = db[type];
+
+  if(!records.length){
+    container.innerHTML = '<div class="empty">Chưa có dữ liệu.</div>';
+    return;
+  }
+
+  container.innerHTML = records.map((record,index)=>{
+    return recordHTML(type,record,index);
+  }).join("");
+}
+
+function renderAll(){
+  TYPES.forEach(renderList);
+}
+
+loadDB();
+
+TYPES.forEach(type=>{
+  const dateField = document
+    .getElementById("form-" + type)
+    .elements.namedItem("ngay");
+  if(dateField) dateField.value = today();
 });
-e.target.reset();
-document.getElementById("eggDate").value=today();
-saveDB();
-alert("Đã lưu số liệu trứng trên thiết bị.");
-};
 
-document.getElementById("incForm").onsubmit=e=>{
-e.preventDefault();
-db.incubations.push({
-id:Date.now(),date:value("incDate"),
-today:number("incToday"),total:number("incTotal"),
-note:value("incNote")
-});
-e.target.reset();
-document.getElementById("incDate").value=today();
-saveDB();
-alert("Đã lưu số liệu tổ ấp.");
-};
-
-document.getElementById("transferForm").onsubmit=e=>{
-e.preventDefault();
-const oldNest=number("oldNest");
-const newNest=number("newNest");
-if(oldNest===newNest){
-alert("Tổ cũ và tổ mới không được giống nhau.");
-return;
-}
-db.transfers.push({
-id:Date.now(),date:value("transferDate"),
-oldNest,newNest,count:number("transferCount"),
-person:value("transferPerson"),note:value("transferNote")
-});
-e.target.reset();
-document.getElementById("transferDate").value=today();
-saveDB();
-alert("Đã lưu chuyển tổ.");
-};
-
-document.getElementById("babyForm").onsubmit=e=>{
-e.preventDefault();
-db.babies.push({
-id:Date.now(),date:value("babyDate"),
-nest:number("babyNest"),count:number("babyCount"),
-reason:value("babyReason"),note:value("babyNote"),
-images:fileCount("babyImages")
-});
-e.target.reset();
-document.getElementById("babyDate").value=today();
-saveDB();
-alert("Đã lưu số liệu chim con.");
-};
-
-function safe(s){
-return String(s??"").replace(/[&<>"']/g,c=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-}[c]));
-}
-
-function list(items,fn,container){
-const el=document.getElementById(container);
-el.innerHTML=items.length?items.slice().reverse().map(fn).join(""):'<div class="empty">Chưa có dữ liệu</div>';
-}
-
-function render(){
-document.getElementById("eggTotal").textContent=db.eggs.reduce((s,x)=>s+x.count,0);
-document.getElementById("eggTransactions").textContent=db.eggs.length;
-
-list(db.eggs,x=>`
-<div class="item">
-<b>${safe(x.date)}</b> · Tổ ${padNest(x.nest)}<br>
-Số trứng: <b>${x.count}</b> · Ảnh: ${x.images||0}<br>
-${safe(x.note)}
-</div>`,"eggHistory");
-
-const latest=db.incubations.length?db.incubations[db.incubations.length-1]:null;
-document.getElementById("incStats").innerHTML=latest?
-`<div class="stats">
-<div class="stat"><strong>${latest.today}</strong><span>Tổ ấp trong ngày</span></div>
-<div class="stat"><strong>${latest.total}</strong><span>Tổng số tổ ấp</span></div>
-</div>`:'<div class="empty">Chưa có số liệu</div>';
-
-list(db.incubations,x=>`
-<div class="item">
-<b>${safe(x.date)}</b><br>
-Tổ ấp trong ngày: ${x.today}<br>
-Tổng số tổ ấp: ${x.total}<br>
-${safe(x.note)}
-</div>`,"incHistory");
-
-document.getElementById("transferTotal").textContent=db.transfers.length;
-document.getElementById("transferBirds").textContent=db.transfers.reduce((s,x)=>s+x.count,0);
-
-list(db.transfers,x=>`
-<div class="item">
-<b>${safe(x.date)}</b><br>
-Tổ ${padNest(x.oldNest)} → Tổ ${padNest(x.newNest)}<br>
-Số chim: <b>${x.count}</b><br>
-Người thực hiện: ${safe(x.person)}<br>
-${safe(x.note)}
-</div>`,"transferHistory");
-
-document.getElementById("babyTotal").textContent=db.babies.reduce((s,x)=>s+x.count,0);
-document.getElementById("babyNests").textContent=new Set(db.babies.map(x=>x.nest)).size;
-
-list(db.babies,x=>`
-<div class="item">
-<b>${safe(x.date)}</b> · Tổ ${padNest(x.nest)}<br>
-Chim con chết: <b>${x.count}</b><br>
-Nguyên nhân: ${safe(x.reason)}<br>
-Ảnh: ${x.images||0}<br>
-${safe(x.note)}
-</div>`,"babyHistory");
-}
-
-function searchNest(){
-const n=number("searchNest");
-const out=document.getElementById("searchResult");
-if(!n||n<1||n>1800){
-out.innerHTML='<p class="muted">Nhập mã tổ từ 1 đến 1800.</p>';
-return;
-}
-const eggs=db.eggs.filter(x=>x.nest===n);
-const transfers=db.transfers.filter(x=>x.oldNest===n||x.newNest===n);
-const babies=db.babies.filter(x=>x.nest===n);
-out.innerHTML=`
-<div class="item">
-<h3>Kết quả tổ ${padNest(n)}</h3>
-<b>Trứng đã ghi nhận:</b> ${eggs.reduce((s,x)=>s+x.count,0)} quả
-</div>
-<div class="item">
-<b>Lượt chuyển liên quan:</b> ${transfers.length}
-</div>
-<div class="item">
-<b>Chim con chết:</b> ${babies.reduce((s,x)=>s+x.count,0)}
-</div>
-<h3>Lịch sử trứng</h3>
-${eggs.map(x=>`<div class="item">${safe(x.date)} · ${x.count} trứng</div>`).join("")||'<p class="muted">Chưa có</p>'}
-<h3>Lịch sử chuyển tổ</h3>
-${transfers.map(x=>`<div class="item">${safe(x.date)} · ${padNest(x.oldNest)} → ${padNest(x.newNest)} · ${x.count} chim</div>`).join("")||'<p class="muted">Chưa có</p>'}
-<h3>Lịch sử chim con</h3>
-${babies.map(x=>`<div class="item">${safe(x.date)} · ${x.count} con · ${safe(x.reason)}</div>`).join("")||'<p class="muted">Chưa có</p>'}
-`;
-}
-
-render();
+renderAll();
 </script>
+
 </body>
 </html>
