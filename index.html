@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- App Trại Chim Của Thảo | bản bỏ chức năng ảnh -->
+<!-- App Thảo: đồng bộ Firebase hai chiều với app chính -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -27,91 +27,670 @@ button{cursor:pointer}.save{background:var(--g);color:white;border:0;border-radi
 </style>
 </head>
 <body>
-<header><h2>APP TRẠI CHIM CỦA THẢO</h2><div id="status">Đang khởi động...</div></header>
+<header>
+<h2>APP TRẠI CHIM CỦA THẢO</h2>
+<div id="status">Đang khởi động...</div>
+</header>
+
 <nav>
-<button class="active" onclick="tab('eggs',this)">🥚 Trứng</button><button onclick="tab('nests',this)">🐣 Tổ ấp</button>
-<button onclick="tab('pairs',this)">❤️ Ghép đôi</button><button onclick="tab('chicks',this)">🐥 Nuôi con</button>
-<button onclick="tab('moves',this)">🔄 Chuyển tổ</button><button onclick="tab('stats',this)">📊 Thống kê</button>
+<button class="active" onclick="tab('home',this)">🏠 Tổng quan</button>
+<button onclick="tab('eggs',this)">🥚 Trứng</button>
+<button onclick="tab('nests',this)">🐣 Tổ ấp</button>
+<button onclick="tab('pairs',this)">❤️ Ghép đôi</button>
+<button onclick="tab('chicks',this)">🐥 Nuôi con</button>
+<button onclick="tab('moves',this)">🔄 Chuyển tổ</button>
+<button onclick="tab('stats',this)">📊 Thống kê</button>
 </nav>
+
 <main>
-<section id="eggs" class="active">
-<div class="card"><h3>Ghi nhận trứng</h3><form id="eggForm" onsubmit="saveForm(event,'eggs')">
-<label>Ngày nhặt</label><input name="date" type="date" required><label>Mã tổ</label><input name="nest" type="number" min="1" max="1800" required>
-<label>Số quả trứng</label><input name="count" type="number" min="1" max="112" value="1" required><label>Ghi chú</label><textarea name="note"></textarea>
-<button class="save" id="eggSubmit">Lưu trứng</button><button class="cancel hidden" id="eggCancel" type="button" onclick="cancelEdit('eggs')">Hủy sửa</button>
-</form></div>
-<div class="card"><h3>Danh sách trứng theo tổ</h3><div id="eggList"></div></div>
+
+<section id="home" class="active">
+<div class="card">
+<h3>Tổng quan kết nối với app chính</h3>
+<p class="muted">Thông tin dưới đây được app chính chia sẻ qua Firebase. Đây là dữ liệu xem tham khảo, không chỉnh sửa tại app Thảo.</p>
+<div id="mainSummary" class="stat">
+<div>Đang tải dữ liệu<b>...</b></div>
+</div>
+<p id="mainUpdated" class="muted">Đang chờ dữ liệu app chính.</p>
+</div>
+
+<div class="card">
+<h3>Công việc của Thảo</h3>
+<div class="stat">
+<div>Số bản ghi trứng<b id="homeEggs">0</b></div>
+<div>Tổ đang ấp<b id="homeNests">0</b></div>
+<div>Lượt ghép đôi<b id="homePairs">0</b></div>
+<div>Lượt giao nuôi<b id="homeChicks">0</b></div>
+</div>
+</div>
 </section>
-<section id="nests"><div class="card"><h3>Thêm tổ vào danh sách ấp</h3><form id="nestForm" onsubmit="saveForm(event,'nests')">
-<label>Ngày bắt đầu ấp</label><input name="date" type="date" required><label>Mã tổ</label><input name="nest" type="number" min="1" max="1800" required>
-<label>Ưu tiên ấp nuôi con</label><select name="priority"><option value="yes">Ưu tiên</option><option value="no">Không ưu tiên</option></select>
-<label>Đánh giá khả năng nuôi con</label><select name="quality"><option value="good">Nuôi con tốt</option><option value="poor">Nuôi con kém</option></select>
-<label>Ghi chú</label><textarea name="note"></textarea><button class="save" id="nestSubmit">Thêm tổ ấp</button><button class="cancel hidden" id="nestCancel" type="button" onclick="cancelEdit('nests')">Hủy sửa</button>
-</form></div><div class="card"><h3>Danh sách tổ ấp và lịch sử</h3><div id="nestList"></div></div></section>
-<section id="pairs"><div class="card"><h3>Ghi nhận ghép đôi</h3><form id="pairForm" onsubmit="saveForm(event,'pairs')">
-<label>Ngày ghép đôi</label><input name="date" type="date" required><label>Mã tổ</label><input name="nest" type="number" min="1" max="1800" required>
-<label>Mã chim trống</label><input name="male"><label>Mã chim mái</label><input name="female"><label>Ghi chú</label><textarea name="note"></textarea>
-<button class="save" id="pairSubmit">Lưu ghép đôi</button><button class="cancel hidden" id="pairCancel" type="button" onclick="cancelEdit('pairs')">Hủy sửa</button>
-</form></div><div class="card"><h3>Lịch bán con dự kiến</h3><div id="saleList"></div></div><div class="card"><h3>Lịch sử ghép đôi</h3><div id="pairList"></div></div></section>
-<section id="chicks"><div class="card"><h3>Ghi nhận giao nuôi con</h3><form id="chickForm" onsubmit="saveForm(event,'chicks')">
-<label>Ngày giao nuôi</label><input name="date" type="date" required><label>Mã tổ nhận nuôi</label><input name="nest" type="number" min="1" max="1800" required>
-<label>Số chim con</label><input name="count" type="number" min="1" required><label>Đánh giá</label><select name="quality"><option value="good">Nuôi tốt</option><option value="poor">Nuôi kém</option></select>
-<label>Ghi chú</label><textarea name="note"></textarea><button class="save" id="chickSubmit">Lưu giao nuôi</button><button class="cancel hidden" id="chickCancel" type="button" onclick="cancelEdit('chicks')">Hủy sửa</button>
-</form></div><div class="card"><h3>Lịch sử nuôi con</h3><div id="chickList"></div></div></section>
-<section id="moves"><div class="card"><h3>Ghi nhận chuyển tổ</h3><form id="moveForm" onsubmit="saveForm(event,'moves')">
-<label>Ngày chuyển</label><input name="date" type="date" required><label>Tổ cũ</label><input name="from" type="number" min="1" max="1800" required>
-<label>Tổ mới</label><input name="to" type="number" min="1" max="1800" required><label>Số chim</label><input name="count" type="number" min="1" required>
-<label>Ghi chú</label><textarea name="note"></textarea><button class="save" id="moveSubmit">Lưu chuyển tổ</button><button class="cancel hidden" id="moveCancel" type="button" onclick="cancelEdit('moves')">Hủy sửa</button>
-</form></div><div class="card"><h3>Lịch sử chuyển tổ</h3><div id="moveList"></div></div></section>
-<section id="stats"><div class="card"><h3>Thống kê</h3><label>Ngày xem</label><input type="date" id="statDate" onchange="render()"><div id="statBox" class="stat"></div></div>
-<div class="card"><h3>Thống kê trứng theo mã tổ</h3><div id="eggStats"></div></div><div class="card"><h3>Đánh giá tổ nuôi con</h3><div id="qualityStats"></div></div><div class="card"><h3>Thống kê bỏ ấp</h3><div id="dropStats"></div></div><div class="card"><h3>Dữ liệu từ app quản lý trại chính</h3><div id="mainAppSummary"><p>Đang tải dữ liệu...</p></div></div></section>
-<p class="muted">Dữ liệu chính được đồng bộ qua Firebase. Không xóa tài liệu dữ liệu cũ complete.</p>
+
+<section id="eggs">
+<div class="card">
+<h3>Ghi nhận trứng</h3>
+<form id="eggForm" onsubmit="saveForm(event,'eggs')">
+<label>Ngày nhặt</label>
+<input name="date" type="date" required>
+<label>Mã tổ</label>
+<input name="nest" type="number" min="1" max="1800" required>
+<label>Số quả trứng</label>
+<input name="count" type="number" min="1" max="112" value="1" required>
+<label>Ghi chú</label>
+<textarea name="note"></textarea>
+<button class="save" id="eggSubmit">Lưu trứng</button>
+<button class="cancel hidden" id="eggCancel" type="button" onclick="cancelEdit('eggs')">Hủy sửa</button>
+</form>
+</div>
+<div class="card">
+<h3>Danh sách trứng theo tổ</h3>
+<div id="eggList"></div>
+</div>
+</section>
+
+<section id="nests">
+<div class="card">
+<h3>Thêm tổ vào danh sách ấp</h3>
+<form id="nestForm" onsubmit="saveForm(event,'nests')">
+<label>Ngày bắt đầu ấp</label>
+<input name="date" type="date" required>
+<label>Mã tổ</label>
+<input name="nest" type="number" min="1" max="1800" required>
+<label>Ưu tiên ấp nuôi con</label>
+<select name="priority">
+<option value="yes">Ưu tiên</option>
+<option value="no">Không ưu tiên</option>
+</select>
+<label>Đánh giá khả năng nuôi con</label>
+<select name="quality">
+<option value="good">Nuôi con tốt</option>
+<option value="poor">Nuôi con kém</option>
+</select>
+<label>Ghi chú</label>
+<textarea name="note"></textarea>
+<button class="save" id="nestSubmit">Thêm tổ ấp</button>
+<button class="cancel hidden" id="nestCancel" type="button" onclick="cancelEdit('nests')">Hủy sửa</button>
+</form>
+</div>
+<div class="card">
+<h3>Danh sách tổ ấp và lịch sử</h3>
+<div id="nestList"></div>
+</div>
+</section>
+
+<section id="pairs">
+<div class="card">
+<h3>Ghi nhận ghép đôi</h3>
+<form id="pairForm" onsubmit="saveForm(event,'pairs')">
+<label>Ngày ghép đôi</label>
+<input name="date" type="date" required>
+<label>Mã tổ</label>
+<input name="nest" type="number" min="1" max="1800" required>
+<label>Mã chim trống</label>
+<input name="male">
+<label>Mã chim mái</label>
+<input name="female">
+<label>Ghi chú</label>
+<textarea name="note"></textarea>
+<button class="save" id="pairSubmit">Lưu ghép đôi</button>
+<button class="cancel hidden" id="pairCancel" type="button" onclick="cancelEdit('pairs')">Hủy sửa</button>
+</form>
+</div>
+<div class="card">
+<h3>Lịch bán con dự kiến</h3>
+<div id="saleList"></div>
+</div>
+<div class="card">
+<h3>Lịch sử ghép đôi</h3>
+<div id="pairList"></div>
+</div>
+</section>
+
+<section id="chicks">
+<div class="card">
+<h3>Ghi nhận giao nuôi con</h3>
+<form id="chickForm" onsubmit="saveForm(event,'chicks')">
+<label>Ngày giao nuôi</label>
+<input name="date" type="date" required>
+<label>Mã tổ nhận nuôi</label>
+<input name="nest" type="number" min="1" max="1800" required>
+<label>Số chim con</label>
+<input name="count" type="number" min="1" required>
+<label>Đánh giá</label>
+<select name="quality">
+<option value="good">Nuôi tốt</option>
+<option value="poor">Nuôi kém</option>
+</select>
+<label>Ghi chú</label>
+<textarea name="note"></textarea>
+<button class="save" id="chickSubmit">Lưu giao nuôi</button>
+<button class="cancel hidden" id="chickCancel" type="button" onclick="cancelEdit('chicks')">Hủy sửa</button>
+</form>
+</div>
+<div class="card">
+<h3>Lịch sử nuôi con</h3>
+<div id="chickList"></div>
+</div>
+</section>
+
+<section id="moves">
+<div class="card">
+<h3>Ghi nhận chuyển tổ</h3>
+<form id="moveForm" onsubmit="saveForm(event,'moves')">
+<label>Ngày chuyển</label>
+<input name="date" type="date" required>
+<label>Tổ cũ</label>
+<input name="from" type="number" min="1" max="1800" required>
+<label>Tổ mới</label>
+<input name="to" type="number" min="1" max="1800" required>
+<label>Số chim</label>
+<input name="count" type="number" min="1" required>
+<label>Ghi chú</label>
+<textarea name="note"></textarea>
+<button class="save" id="moveSubmit">Lưu chuyển tổ</button>
+<button class="cancel hidden" id="moveCancel" type="button" onclick="cancelEdit('moves')">Hủy sửa</button>
+</form>
+</div>
+<div class="card">
+<h3>Lịch sử chuyển tổ</h3>
+<div id="moveList"></div>
+</div>
+</section>
+
+<section id="stats">
+<div class="card">
+<h3>Thống kê</h3>
+<label>Ngày xem</label>
+<input type="date" id="statDate" onchange="render()">
+<div id="statBox" class="stat"></div>
+</div>
+<div class="card">
+<h3>Thống kê trứng theo mã tổ</h3>
+<div id="eggStats"></div>
+</div>
+<div class="card">
+<h3>Đánh giá tổ nuôi con</h3>
+<div id="qualityStats"></div>
+</div>
+<div class="card">
+<h3>Thống kê bỏ ấp</h3>
+<div id="dropStats"></div>
+</div>
+</section>
+
+<p class="muted">Dữ liệu Thảo được lưu riêng tại Firebase. App chính và app Thảo trao đổi dữ liệu qua hai nhánh độc lập; không ghi đè dữ liệu gốc của app chính.</p>
 </main>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
-const firebaseConfig={apiKey:"AIzaSyAE7M7khdVyErE3L81IhJOiqTQxtB9inxI",authDomain:"trai-chim-cua-toi.firebaseapp.com",projectId:"trai-chim-cua-toi",storageBucket:"trai-chim-cua-toi.firebasestorage.app",messagingSenderId:"221656058023",appId:"1:221656058023:web:c44894b5a709f6a9863382",measurementId:"G-7ZFZM6M7XC"};
-const DOC="users/1ePS2ZPFVpVyErE3L81CzJT6kPb2/farmData/appThaoV1",KEY="thaoBirdFarmDemoV1",TYPES=["eggs","nests","pairs","chicks","moves"];
-let db={eggs:[],nests:[],pairs:[],chicks:[],moves:[],drops:[]},editing={},cloud=null,ref=null,ready=false,busy=false,mainDBMirror=null;
+const firebaseConfig={
+ apiKey:"AIzaSyAE7M7khdVyErE3L81IhJOiqTQxtB9inxI",
+ authDomain:"trai-chim-cua-toi.firebaseapp.com",
+ projectId:"trai-chim-cua-toi",
+ storageBucket:"trai-chim-cua-toi.firebasestorage.app",
+ messagingSenderId:"221656058023",
+ appId:"1:221656058023:web:c44894b5a709f6a9863382",
+ measurementId:"G-7ZFZM6M7XC"
+};
+
+const DOC="users/1ePS2ZPFVpVyErE3L81CzJT6kPb2/farmData/appThaoV1";
+const KEY="thaoBirdFarmDemoV1";
+const TYPES=["eggs","nests","pairs","chicks","moves"];
+
+let db={eggs:[],nests:[],pairs:[],chicks:[],moves:[],drops:[]};
+let mainDB=null;
+let editing={};
+let cloud=null;
+let ref=null;
+let ready=false;
+let writeQueue=Promise.resolve();
+let receiving=false;
+
 const $=id=>document.getElementById(id);
-function today(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
-function fmt(d){return d?d.split("-").reverse().join("/"):""}
-function nestFmt(n){n=Number(n);return n<1000?String(n).padStart(3,"0"):String(n)}
-function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function datePlus(d,n){let x=new Date(d+"T12:00:00");x.setDate(x.getDate()+n);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")}
-function localSave(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
-function localLoad(){try{let old=JSON.parse(localStorage.getItem(KEY)||"{}");if(Array.isArray(old.trung))db.eggs=old.trung.map(x=>({...x,date:x.ngay,nest:x.maTo,count:x.soTrung||1,note:x.ghiChu}));if(Array.isArray(old.toAp))db.nests=old.toAp.filter(x=>x.maTo!==undefined).map(x=>({...x,date:x.ngay,nest:x.maTo,active:x.active!==false,priority:"yes",quality:"good",note:x.ghiChu}));if(Array.isArray(old.chuyenTo))db.moves=old.chuyenTo.map(x=>({...x,date:x.ngay,from:x.toCu,to:x.toMoi,count:x.soChim,note:x.lyDo}));if(Array.isArray(old.chimCon))db.chicks=old.chimCon.map(x=>({...x,date:x.ngay,nest:x.maTo,count:x.soChet,note:x.ghiChu}))}catch(e){}}
-function setStatus(s){$("status").textContent=s}
-function tab(id,btn){document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");btn.classList.add("active")}
-function getForm(t){return $(t==="eggs"?"eggForm":t==="nests"?"nestForm":t==="pairs"?"pairForm":t==="chicks"?"chickForm":"moveForm")}
-function fields(f){let o={};new FormData(f).forEach((v,k)=>o[k]=v);return o}
-function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
-async function persist(){localSave();if(!ref||!ready)return;if(busy)return;busy=true;try{const thaoDB={eggs:db.eggs,nests:db.nests,pairs:db.pairs,chicks:db.chicks,moves:db.moves,drops:db.drops};await cloud.runTransaction(async tx=>{await tx.get(ref);tx.set(ref,{...thaoDB,thaoDB,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})});setStatus("Đã đồng bộ dữ liệu")}catch(e){setStatus("Lỗi đồng bộ: "+e.message);console.error(e)}finally{busy=false}}
-function saveForm(ev,type){ev.preventDefault();let f=getForm(type),d=fields(f),idx=editing[type];if(d.nest!==undefined&&(!Number.isInteger(Number(d.nest))||Number(d.nest)<1||Number(d.nest)>1800)){alert("Mã tổ phải từ 1 đến 1800");return}if(d.nest!==undefined)d.nest=Number(d.nest);if(d.count!==undefined)d.count=Number(d.count);if(type==="moves"){d.from=Number(d.from);d.to=Number(d.to);d.count=Number(d.count);if(d.from===d.to){alert("Tổ cũ và tổ mới không được giống nhau");return}}if(type==="nests"){let duplicate=db.nests.some((x,i)=>x.active!==false&&Number(x.nest)===d.nest&&i!==idx);if(duplicate){alert("Tổ này đang trong danh sách ấp");return}d.active=true}d.id=idx!==undefined&&idx!==null?db[type][idx].id:newId();if(idx!==undefined&&idx!==null)db[type][idx]=d;else db[type].unshift(d);delete editing[type];f.reset();let date=f.elements.namedItem("date");if(date)date.value=today();persist();render();updateButtons(type)}
-function updateButtons(t){let p=t==="eggs"?"egg":t==="nests"?"nest":t==="pairs"?"pair":t==="chicks"?"chick":"move";$(p+"Submit").textContent=t==="eggs"?"Lưu trứng":t==="nests"?"Thêm tổ ấp":"Lưu thông tin";$(p+"Cancel").classList.add("hidden")}
-function cancelEdit(t){editing[t]=null;let f=getForm(t);f.reset();let d=f.elements.namedItem("date");if(d)d.value=today();updateButtons(t)}
-function edit(t,id){let idx=db[t].findIndex(x=>x.id===id);if(idx<0)return;editing[t]=idx;let f=getForm(t);f.reset();Object.entries(db[t][idx]).forEach(([k,v])=>{let el=f.elements.namedItem(k);if(el)el.value=v??""});let p=t==="eggs"?"egg":t==="nests"?"nest":t==="pairs"?"pair":t==="chicks"?"chick":"move";$(p+"Submit").textContent="Cập nhật";$(p+"Cancel").classList.remove("hidden");f.scrollIntoView({behavior:"smooth"})}
-async function remove(t,id){if(!confirm("Xóa bản ghi này?"))return;db[t]=db[t].filter(x=>x.id!==id);await persist();render()}
-function buttons(t,id){return `<div class="actions"><button class="edit" onclick="edit('${t}','${id}')">Sửa</button><button class="del" onclick="remove('${t}','${id}')">Xóa</button></div>`}
-function item(title,lines,t,r){return `<div class="item"><b>${title}</b>${lines.map(x=>`<p>${x}</p>`).join("")}${buttons(t,r.id)}</div>`}
-function render(){
-$("eggList").innerHTML=db.eggs.length?db.eggs.map(r=>item("Trứng tổ "+nestFmt(r.nest),["Ngày: "+fmt(r.date),"Số quả: "+r.count,"Ghi chú: "+safe(r.note)],"eggs",r)).join(""):"<p>Chưa có dữ liệu trứng.</p>";
-$("nestList").innerHTML=db.nests.length?db.nests.map(r=>{let status=r.active===false?"Đã kết thúc":"Đang ấp",drop=`<button class="cancel" onclick="dropNest('${r.id}')">Bỏ ấp</button>`;return item("Tổ "+nestFmt(r.nest),["Ngày vào ấp: "+fmt(r.date),"Trạng thái: "+status,"Ưu tiên: "+(r.priority==="yes"&&r.quality!=="poor"?"Có":"Không"),"Đánh giá: "+(r.quality==="poor"?"Nuôi con kém":"Nuôi con tốt"),"Ghi chú: "+safe(r.note)],"nests",r)+(r.active===false?"":drop)}).join(""):"<p>Chưa có tổ ấp.</p>";
-$("pairList").innerHTML=db.pairs.length?db.pairs.map(r=>item("Ghép đôi tổ "+nestFmt(r.nest),["Ngày ghép: "+fmt(r.date),"Trống: "+safe(r.male),"Mái: "+safe(r.female),"Ghi chú: "+safe(r.note)],"pairs",r)).join(""):"<p>Chưa có dữ liệu ghép đôi.</p>";
-$("saleList").innerHTML=db.pairs.map(r=>`<div class="item"><b>Tổ ${nestFmt(r.nest)}</b><p>Ngày ghép: ${fmt(r.date)}</p><p>Dự kiến bán: ${fmt(datePlus(r.date,25))} đến ${fmt(datePlus(r.date,30))}</p></div>`).join("")||"Chưa có lịch bán.";
-$("chickList").innerHTML=db.chicks.length?db.chicks.map(r=>item("Nuôi con tổ "+nestFmt(r.nest),["Ngày: "+fmt(r.date),"Số chim: "+r.count,"Đánh giá: "+(r.quality==="poor"?"Nuôi kém":"Nuôi tốt"),"Ghi chú: "+safe(r.note)],"chicks",r)).join(""):"<p>Chưa có dữ liệu.</p>";
-$("moveList").innerHTML=db.moves.length?db.moves.map(r=>item("Chuyển tổ",["Ngày: "+fmt(r.date),"Từ tổ "+nestFmt(r.from)+" sang tổ "+nestFmt(r.to),"Số chim: "+r.count,"Ghi chú: "+safe(r.note)],"moves",r)).join(""):"<p>Chưa có dữ liệu.</p>";
-let date=$("statDate").value||today(),eggs=db.eggs.filter(x=>x.date===date).reduce((s,x)=>s+Number(x.count||1),0),nestCount=db.nests.filter(x=>x.active!==false).length,pairs=db.pairs.filter(x=>x.date===date).length;
-$("statBox").innerHTML=`<div>Trứng trong ngày<b>${eggs}</b></div><div>Tổ đang ấp<b>${nestCount}</b></div><div>Ghép đôi trong ngày<b>${pairs}</b></div><div>Lượt giao nuôi<b>${db.chicks.length}</b></div>`;
-let groups={};db.eggs.forEach(x=>groups[x.nest]=(groups[x.nest]||0)+Number(x.count||1));$("eggStats").innerHTML=Object.keys(groups).sort((a,b)=>a-b).map(k=>`<p>Tổ ${nestFmt(k)}: <b>${groups[k]} quả</b></p>`).join("")||"Chưa có dữ liệu.";
-let q={};db.chicks.forEach(x=>{q[x.nest]??={good:0,poor:0};q[x.nest][x.quality==="poor"?"poor":"good"]++});$("qualityStats").innerHTML=Object.entries(q).map(([k,v])=>`<p>Tổ ${nestFmt(k)}: nuôi tốt ${v.good} lần, nuôi kém ${v.poor} lần</p>`).join("")||"Chưa có dữ liệu.";
-$("dropStats").innerHTML=`Đã bỏ ấp: <b>${db.drops.length}</b> lần`;renderMainMirror()
+
+function today(){
+ const d=new Date();
+ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
 }
-async function dropNest(id){let r=db.nests.find(x=>x.id===id);if(!r)return;let reason=prompt("Lý do bỏ ấp (có thể để trống):","");if(reason===null)return;r.active=false;r.endDate=today();db.drops.unshift({id:newId(),nest:r.nest,date:today(),reason});await persist();render()}
-function renderMainMirror(){const el=$("mainAppSummary");if(!el)return;const m=mainDBMirror||{};const coops=Array.isArray(m.coops)?m.coops:[],eggs=Array.isArray(m.eggs)?m.eggs:[],pairs=Array.isArray(m.pairings)?m.pairings:[],chicks=Array.isArray(m.chicks)?m.chicks:[];const eggTotal=eggs.reduce((n,x)=>n+Number(x.count1||0)+Number(x.count2||0),0);el.innerHTML=mainDBMirror?`<p>Ô trong app chính: <b>${coops.length.toLocaleString("vi-VN")}</b></p><p>Lượt ghi trứng: <b>${eggs.length.toLocaleString("vi-VN")}</b> · Số trứng ghi nhận: <b>${eggTotal.toLocaleString("vi-VN")}</b></p><p>Đợt ghép: <b>${pairs.length.toLocaleString("vi-VN")}</b> · Lượt cập nhật chim con: <b>${chicks.length.toLocaleString("vi-VN")}</b></p><p class="muted">Đây là dữ liệu chỉ xem từ app chính, app Thảo không sửa dữ liệu này.</p>`:"<p>Chưa nhận được dữ liệu từ app quản lý trại chính.</p>"}
-async function startCloud(){try{firebase.initializeApp(firebaseConfig);cloud=firebase.firestore();await firebase.auth().signInAnonymously();ref=cloud.doc(DOC);let snap=await ref.get();if(snap.exists){let x=snap.data(),t=x.thaoDB||x;TYPES.forEach(k=>{if(Array.isArray(t[k]))db[k]=t[k]});db.drops=Array.isArray(t.drops)?t.drops:[];mainDBMirror=x.mainDB||null}else{const thaoDB={...db};await ref.set({ ...thaoDB,thaoDB,createdAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}ready=true;localSave();setStatus("Đã kết nối và đồng bộ");ref.onSnapshot(s=>{if(!s.exists||busy)return;let x=s.data(),t=x.thaoDB||x;TYPES.forEach(k=>{if(Array.isArray(t[k]))db[k]=t[k]});db.drops=Array.isArray(t.drops)?t.drops:[];mainDBMirror=x.mainDB||null;localSave();render()},e=>setStatus("Lỗi nhận dữ liệu: "+e.message));render()}catch(e){setStatus("Chưa kết nối máy chủ - đang dùng dữ liệu trên máy");console.error(e)}}
-TYPES.forEach(t=>{let f=getForm(t),d=f.elements.namedItem("date");if(d)d.value=today()});$("statDate").value=today();localLoad();render();startCloud();
+
+function fmt(d){
+ return d?d.split("-").reverse().join("/"):"";
+}
+
+function nestFmt(n){
+ n=Number(n);
+ return n<1000?String(n).padStart(3,"0"):String(n);
+}
+
+function safe(s){
+ return String(s??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#39;"
+ }[c]));
+}
+
+function datePlus(d,n){
+ let x=new Date(d+"T12:00:00");
+ x.setDate(x.getDate()+n);
+ return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
+}
+
+function localSave(){
+ try{
+  localStorage.setItem(KEY,JSON.stringify(db));
+ }catch(e){}
+}
+
+function localLoad(){
+ try{
+  let old=JSON.parse(localStorage.getItem(KEY)||"{}");
+
+  TYPES.forEach(k=>{
+   if(Array.isArray(old[k]))db[k]=old[k];
+  });
+
+  if(Array.isArray(old.drops))db.drops=old.drops;
+
+  if(Array.isArray(old.trung)&&!Array.isArray(old.eggs)){
+   db.eggs=old.trung.map(x=>({...x,date:x.ngay,nest:x.maTo,count:x.soTrung||1,note:x.ghiChu}));
+  }
+
+  if(Array.isArray(old.toAp)&&!Array.isArray(old.nests)){
+   db.nests=old.toAp.filter(x=>x.maTo!==undefined).map(x=>({...x,date:x.ngay,nest:x.maTo,active:x.active!==false,priority:"yes",quality:"good",note:x.ghiChu}));
+  }
+
+  if(Array.isArray(old.chuyenTo)&&!Array.isArray(old.moves)){
+   db.moves=old.chuyenTo.map(x=>({...x,date:x.ngay,from:x.toCu,to:x.toMoi,count:x.soChim,note:x.lyDo}));
+  }
+
+  if(Array.isArray(old.chimCon)&&!Array.isArray(old.chicks)){
+   db.chicks=old.chimCon.map(x=>({...x,date:x.ngay,nest:x.maTo,count:x.soChet,note:x.ghiChu}));
+  }
+ }catch(e){}
+}
+
+function setStatus(s){
+ $("status").textContent=s;
+}
+
+function tab(id,btn){
+ document.querySelectorAll("main section").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+ if(btn)btn.classList.add("active");
+}
+
+function getForm(t){
+ return $(t==="eggs"?"eggForm":t==="nests"?"nestForm":t==="pairs"?"pairForm":t==="chicks"?"chickForm":"moveForm");
+}
+
+function fields(f){
+ let o={};
+ new FormData(f).forEach((v,k)=>o[k]=v);
+ return o;
+}
+
+function newId(){
+ return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+}
+
+async function persist(){
+ localSave();
+
+ if(!ref||!ready){
+  setStatus("Đã lưu trên iPhone; đang chờ kết nối Firebase.");
+  return;
+ }
+
+ const snapshot=JSON.parse(JSON.stringify(db));
+
+ writeQueue=writeQueue.then(async()=>{
+  try{
+   // Chỉ ghi nhánh thaoDB và các trường cũ để tương thích dữ liệu phiên bản trước.
+   // merge:true bảo vệ nhánh mainDB do app chính ghi.
+   await ref.set({
+    thaoDB:snapshot,
+    eggs:snapshot.eggs,
+    nests:snapshot.nests,
+    pairs:snapshot.pairs,
+    chicks:snapshot.chicks,
+    moves:snapshot.moves,
+    drops:snapshot.drops,
+    thaoUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+
+   setStatus("Đã đồng bộ dữ liệu Thảo lên Firebase.");
+  }catch(e){
+   setStatus("Lỗi đồng bộ: "+e.message);
+   console.error(e);
+  }
+ });
+
+ return writeQueue;
+}
+
+function saveForm(ev,type){
+ ev.preventDefault();
+
+ let f=getForm(type);
+ let d=fields(f);
+ let idx=editing[type];
+
+ if(d.nest!==undefined&&(!Number.isInteger(Number(d.nest))||Number(d.nest)<1||Number(d.nest)>1800)){
+  alert("Mã tổ phải từ 1 đến 1800");
+  return;
+ }
+
+ if(d.nest!==undefined)d.nest=Number(d.nest);
+ if(d.count!==undefined)d.count=Number(d.count);
+
+ if(type==="moves"){
+  d.from=Number(d.from);
+  d.to=Number(d.to);
+  d.count=Number(d.count);
+
+  if(d.from===d.to){
+   alert("Tổ cũ và tổ mới không được giống nhau");
+   return;
+  }
+ }
+
+ if(type==="nests"){
+  let duplicate=db.nests.some((x,i)=>x.active!==false&&Number(x.nest)===d.nest&&i!==idx);
+
+  if(duplicate){
+   alert("Tổ này đang trong danh sách ấp");
+   return;
+  }
+
+  d.active=true;
+ }
+
+ d.id=idx!==undefined&&idx!==null?db[type][idx].id:newId();
+
+ if(idx!==undefined&&idx!==null)db[type][idx]=d;
+ else db[type].unshift(d);
+
+ delete editing[type];
+
+ f.reset();
+
+ let date=f.elements.namedItem("date");
+ if(date)date.value=today();
+
+ persist();
+ render();
+ updateButtons(type);
+}
+
+function updateButtons(t){
+ let p=t==="eggs"?"egg":t==="nests"?"nest":t==="pairs"?"pair":t==="chicks"?"chick":"move";
+
+ $(p+"Submit").textContent=t==="eggs"?"Lưu trứng":t==="nests"?"Thêm tổ ấp":"Lưu thông tin";
+ $(p+"Cancel").classList.add("hidden");
+}
+
+function cancelEdit(t){
+ editing[t]=null;
+
+ let f=getForm(t);
+ f.reset();
+
+ let d=f.elements.namedItem("date");
+ if(d)d.value=today();
+
+ updateButtons(t);
+}
+
+function edit(t,id){
+ let idx=db[t].findIndex(x=>x.id===id);
+ if(idx<0)return;
+
+ editing[t]=idx;
+
+ let f=getForm(t);
+ f.reset();
+
+ Object.entries(db[t][idx]).forEach(([k,v])=>{
+  let el=f.elements.namedItem(k);
+  if(el)el.value=v??"";
+ });
+
+ let p=t==="eggs"?"egg":t==="nests"?"nest":t==="pairs"?"pair":t==="chicks"?"chick":"move";
+
+ $(p+"Submit").textContent="Cập nhật";
+ $(p+"Cancel").classList.remove("hidden");
+
+ f.scrollIntoView({behavior:"smooth"});
+}
+
+async function remove(t,id){
+ if(!confirm("Xóa bản ghi này?"))return;
+
+ db[t]=db[t].filter(x=>x.id!==id);
+
+ await persist();
+ render();
+}
+
+function buttons(t,id){
+ return `<div class="actions"><button class="edit" onclick="edit('${t}','${id}')">Sửa</button><button class="del" onclick="remove('${t}','${id}')">Xóa</button></div>`;
+}
+
+function item(title,lines,t,r){
+ return `<div class="item"><b>${title}</b>${lines.map(x=>`<p>${x}</p>`).join("")}${buttons(t,r.id)}</div>`;
+}
+
+function render(){
+ $("eggList").innerHTML=db.eggs.length
+  ?db.eggs.map(r=>item("Trứng tổ "+nestFmt(r.nest),["Ngày: "+fmt(r.date),"Số quả: "+r.count,"Ghi chú: "+safe(r.note)],"eggs",r)).join("")
+  :"<p>Chưa có dữ liệu trứng.</p>";
+
+ $("nestList").innerHTML=db.nests.length
+  ?db.nests.map(r=>{
+   let status=r.active===false?"Đã kết thúc":"Đang ấp";
+   let drop=`<button class="cancel" onclick="dropNest('${r.id}')">Bỏ ấp</button>`;
+   return item("Tổ "+nestFmt(r.nest),["Ngày vào ấp: "+fmt(r.date),"Trạng thái: "+status,"Ưu tiên: "+(r.priority==="yes"&&r.quality!=="poor"?"Có":"Không"),"Đánh giá: "+(r.quality==="poor"?"Nuôi con kém":"Nuôi con tốt"),"Ghi chú: "+safe(r.note)],"nests",r)+(r.active===false?"":drop);
+  }).join("")
+  :"<p>Chưa có tổ ấp.</p>";
+
+ $("pairList").innerHTML=db.pairs.length
+  ?db.pairs.map(r=>item("Ghép đôi tổ "+nestFmt(r.nest),["Ngày ghép: "+fmt(r.date),"Trống: "+safe(r.male),"Mái: "+safe(r.female),"Ghi chú: "+safe(r.note)],"pairs",r)).join("")
+  :"<p>Chưa có dữ liệu ghép đôi.</p>";
+
+ $("saleList").innerHTML=db.pairs.map(r=>
+  `<div class="item"><b>Tổ ${nestFmt(r.nest)}</b><p>Ngày ghép: ${fmt(r.date)}</p><p>Dự kiến bán: ${fmt(datePlus(r.date,25))} đến ${fmt(datePlus(r.date,30))}</p></div>`
+ ).join("")||"Chưa có lịch bán.";
+
+ $("chickList").innerHTML=db.chicks.length
+  ?db.chicks.map(r=>item("Nuôi con tổ "+nestFmt(r.nest),["Ngày: "+fmt(r.date),"Số chim: "+r.count,"Đánh giá: "+(r.quality==="poor"?"Nuôi kém":"Nuôi tốt"),"Ghi chú: "+safe(r.note)],"chicks",r)).join("")
+  :"<p>Chưa có dữ liệu.</p>";
+
+ $("moveList").innerHTML=db.moves.length
+  ?db.moves.map(r=>item("Chuyển tổ",["Ngày: "+fmt(r.date),"Từ tổ "+nestFmt(r.from)+" sang tổ "+nestFmt(r.to),"Số chim: "+r.count,"Ghi chú: "+safe(r.note)],"moves",r)).join("")
+  :"<p>Chưa có dữ liệu.</p>";
+
+ let date=$("statDate").value||today();
+ let eggs=db.eggs.filter(x=>x.date===date).reduce((s,x)=>s+Number(x.count||1),0);
+ let nestCount=db.nests.filter(x=>x.active!==false).length;
+ let pairs=db.pairs.filter(x=>x.date===date).length;
+
+ $("statBox").innerHTML=
+  `<div>Trứng trong ngày<b>${eggs}</b></div>
+   <div>Tổ đang ấp<b>${nestCount}</b></div>
+   <div>Ghép đôi trong ngày<b>${pairs}</b></div>
+   <div>Lượt giao nuôi<b>${db.chicks.length}</b></div>`;
+
+ let groups={};
+ db.eggs.forEach(x=>groups[x.nest]=(groups[x.nest]||0)+Number(x.count||1));
+
+ $("eggStats").innerHTML=Object.keys(groups).sort((a,b)=>a-b).map(k=>
+  `<p>Tổ ${nestFmt(k)}: <b>${groups[k]} quả</b></p>`
+ ).join("")||"Chưa có dữ liệu.";
+
+ let q={};
+ db.chicks.forEach(x=>{
+  q[x.nest]??={good:0,poor:0};
+  q[x.nest][x.quality==="poor"?"poor":"good"]++;
+ });
+
+ $("qualityStats").innerHTML=Object.entries(q).map(([k,v])=>
+  `<p>Tổ ${nestFmt(k)}: nuôi tốt ${v.good} lần, nuôi kém ${v.poor} lần</p>`
+ ).join("")||"Chưa có dữ liệu.";
+
+ $("dropStats").innerHTML=`Đã bỏ ấp: <b>${db.drops.length}</b> lần`;
+
+ $("homeEggs").textContent=db.eggs.length;
+ $("homeNests").textContent=db.nests.filter(x=>x.active!==false).length;
+ $("homePairs").textContent=db.pairs.length;
+ $("homeChicks").textContent=db.chicks.length;
+
+ renderMainSummary();
+}
+
+async function dropNest(id){
+ let r=db.nests.find(x=>x.id===id);
+ if(!r)return;
+
+ let reason=prompt("Lý do bỏ ấp (có thể để trống):","");
+ if(reason===null)return;
+
+ r.active=false;
+ r.endDate=today();
+
+ db.drops.unshift({
+  id:newId(),
+  nest:r.nest,
+  date:today(),
+  reason
+ });
+
+ await persist();
+ render();
+}
+
+function renderMainSummary(){
+ const el=$("mainSummary");
+ const updated=$("mainUpdated");
+
+ if(!mainDB){
+  el.innerHTML='<div>Trạng thái<b>Chưa nhận dữ liệu</b></div>';
+  updated.textContent="App chính chưa gửi dữ liệu sang Firebase hoặc chưa kết nối.";
+  return;
+ }
+
+ const count=(k)=>Number(mainDB[k+"Count"]??(Array.isArray(mainDB[k])?mainDB[k].length:0));
+
+ el.innerHTML=
+  `<div>Số tổ trong app chính<b>${count("coops")}</b></div>
+   <div>Lịch ấp<b>${count("incubations")}</b></div>
+   <div>Ghi nhận trứng<b>${count("eggs")}</b></div>
+   <div>Ghép đôi<b>${count("pairings")}</b></div>`;
+
+ updated.textContent="Đã nhận dữ liệu app chính. Thời điểm cập nhật: "+(mainDB.updatedAt||"đã kết nối");
+}
+
+function applyThaoData(x){
+ const source=x.thaoDB&&typeof x.thaoDB==="object"?x.thaoDB:x;
+
+ TYPES.forEach(k=>{
+  if(Array.isArray(source[k]))db[k]=source[k];
+ });
+
+ db.drops=Array.isArray(source.drops)?source.drops:[];
+}
+
+async function startCloud(){
+ try{
+  if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+
+  cloud=firebase.firestore();
+
+  // Đăng nhập ẩn danh, Thảo không phải nhập tài khoản.
+  await firebase.auth().signInAnonymously();
+
+  ref=cloud.doc(DOC);
+
+  const snap=await ref.get();
+
+  if(snap.exists){
+   const x=snap.data();
+   applyThaoData(x);
+   mainDB=x.mainDB||null;
+  }else{
+   await ref.set({
+    thaoDB:db,
+    eggs:db.eggs,
+    nests:db.nests,
+    pairs:db.pairs,
+    chicks:db.chicks,
+    moves:db.moves,
+    drops:db.drops,
+    thaoUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()
+   },{merge:true});
+  }
+
+  ready=true;
+  localSave();
+  setStatus("Đã kết nối Firebase. Đang đồng bộ hai chiều.");
+  render();
+
+  // Tự nhận thay đổi từ app chính hoặc thiết bị Thảo khác.
+  ref.onSnapshot(s=>{
+   if(!s.exists)return;
+
+   const x=s.data();
+   mainDB=x.mainDB||null;
+
+   const incoming=x.thaoDB&&typeof x.thaoDB==="object"?x.thaoDB:x;
+
+   const current=JSON.stringify(db);
+   const next=JSON.stringify({
+    eggs:incoming.eggs||[],
+    nests:incoming.nests||[],
+    pairs:incoming.pairs||[],
+    chicks:incoming.chicks||[],
+    moves:incoming.moves||[],
+    drops:incoming.drops||[]
+   });
+
+   if(current!==next){
+    receiving=true;
+    applyThaoData(x);
+    localSave();
+    render();
+    receiving=false;
+   }else{
+    renderMainSummary();
+   }
+
+   if(mainDB)setStatus("Đã kết nối và nhận cập nhật từ app chính.");
+  },e=>{
+   setStatus("Lỗi nhận dữ liệu Firebase: "+e.message);
+  });
+
+ }catch(e){
+  setStatus("Chưa kết nối Firebase: "+e.message+". Dữ liệu vẫn lưu trên iPhone.");
+  console.error(e);
+ }
+}
+
+TYPES.forEach(t=>{
+ let f=getForm(t);
+ let d=f.elements.namedItem("date");
+ if(d)d.value=today();
+});
+
+$("statDate").value=today();
+
+localLoad();
+render();
+startCloud();
 </script>
 </body>
 </html>
