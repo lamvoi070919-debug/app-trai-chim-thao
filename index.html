@@ -28,16 +28,9 @@ button{cursor:pointer}.save{background:var(--g);color:white;border:0;border-radi
 <header><h2>APP TRẠI CHIM CỦA THẢO</h2><div id="status">Đang khởi động...</div></header>
 <nav>
 <button class="active" onclick="tab('home',this)">🏠 Tổng quan</button>
-<button onclick="tab('tasks',this)">📋 Công việc</button>
-<button onclick="tab('eggs',this)">🥚 Trứng nhặt</button>
-<button onclick="tab('nests',this)">🐣 Tổ ấp</button>
-<button onclick="tab('pairs',this)">❤️ Ghép con</button>
-<button onclick="tab('chicks',this)">🐥 Nuôi con</button>
-<button onclick="tab('moves',this)">🔄 Chuyển tổ</button>
-<button onclick="tab('coops',this)">🏠 Danh sách ô</button>
-<button onclick="tab('sales',this)">💰 Bán chim</button>
-<button onclick="tab('weights',this)">⚖️ Cân chim</button>
-<button onclick="tab('stats',this)">📊 Thống kê</button>
+<button onclick="tab('eggs',this)">🥚 Nhặt trứng</button>
+<button onclick="tab('nests',this)">🐣 Cho tổ ấp</button>
+<button onclick="tab('moves',this)">🔄 Đảo / chuyển con</button>
 </nav>
 <main>
 <section id="home" class="active">
@@ -56,10 +49,11 @@ button{cursor:pointer}.save{background:var(--g);color:white;border:0;border-radi
 </section>
 
 <section id="eggs">
-<div class="card"><h3>Ghi nhận trứng nhặt</h3><form id="eggForm" onsubmit="saveForm(event,'eggs')">
-<label>Ngày nhặt</label><input name="date" type="date" required><label>Mã tổ</label><input name="nest" type="number" min="1" max="1800" required>
-<label>Số quả trứng</label><input name="count" type="number" min="1" max="112" value="1" required><label>Ghi chú</label><textarea name="note"></textarea>
-<button class="save" id="eggSubmit">Lưu trứng</button><button class="cancel hidden" id="eggCancel" type="button" onclick="cancelEdit('eggs')">Hủy sửa</button></form></div>
+<div class="card"><h3>Nhập nhanh danh sách trứng nhặt</h3><form id="eggForm" onsubmit="saveEggBatchThao(event)">
+<label>Ngày nhặt (chọn một lần)</label><input name="date" type="date" required><label>Danh sách mã tổ</label><textarea name="nestList" rows="3" required placeholder="001, 002, 015
+Có thể ghi số lượng: 001:2, 002:1"></textarea>
+<label>Phân loại</label><select name="eggType"><option value="normal">Trứng bình thường</option><option value="white">Trứng trắng / không phôi</option><option value="dead">Trứng chết lắc</option></select><label>Ghi chú chung</label><textarea name="note"></textarea>
+<button class="save" id="eggSubmit">Lưu danh sách trứng</button><button class="cancel hidden" id="eggCancel" type="button" onclick="cancelEdit('eggs')">Hủy sửa</button></form><p class="muted">Mặc định mỗi tổ là 1 quả. Ghi 001:2 nếu tổ có 2 quả. Đủ 2 trứng bình thường trong cùng lứa (cách nhau tối đa 2 ngày) sẽ tự đề xuất tổ ấp.</p></div>
 <div class="card"><h3>Thống kê trứng theo ngày</h3><label>Chọn ngày xem</label><input type="date" id="eggDay" onchange="render()"><div id="eggDaySummary" class="stat"></div><div id="eggDayDetails"></div></div>
 <div class="card"><h3>Tổng hợp theo tháng</h3><label>Tháng xem</label><input type="month" id="eggMonth" onchange="render()"><div id="eggMonthSummary"></div></div>
 <div class="card"><h3>Lịch sử trứng theo tổ</h3><div id="eggList"></div></div>
@@ -73,21 +67,22 @@ button{cursor:pointer}.save{background:var(--g);color:white;border:0;border-radi
 <label>Ghi chú</label><textarea name="note"></textarea><button class="save" id="nestSubmit">Lưu tổ chờ duyệt</button><button class="cancel hidden" id="nestCancel" type="button" onclick="cancelEdit('nests')">Hủy sửa</button></form></div>
 <div class="card"><h3>Đánh giá và xếp ưu tiên ấp</h3><p class="muted">Đối chiếu lịch sử ghép, số chim nuôi đạt, tỷ lệ chết và số chim gần bán. Chỉ đề xuất khi có dữ liệu; không tự loại tổ.</p><button class="save" type="button" onclick="evaluateIncubationPriority()">ĐÁNH GIÁ ƯU TIÊN ẤP</button><div id="priorityList"></div></div>
 <div class="card"><h3>Danh sách tổ chờ duyệt và lịch sử quyết định</h3><div id="nestList"></div><div id="approvalHistory"></div></div>
+<div class="card"><h3>Lịch ghép con từ App chính</h3><p class="muted">Chỉ xem ngày ghép và số con từng tổ để chủ động theo dõi, đảo hoặc chuyển con.</p><div id="pairList"></div></div>
 </section>
 
 <section id="pairs">
-<div class="card"><h3>Lịch ghép con từ App chính</h3><p class="muted">Thảo chỉ xem lịch ghép do chủ trại tạo và xác nhận. Không tạo, sửa hoặc xóa ghép chính tại đây. Ngày kiểm tra sau ghép được tính từ ngày ghép thực tế đã xác nhận.</p><div id="pairList"></div></div>
+<div class="card"><h3>Lịch ghép con từ App chính</h3><p class="muted">Thảo chỉ xem lịch ghép do chủ trại tạo và xác nhận. Không tạo, sửa hoặc xóa ghép chính tại đây. Ngày kiểm tra sau ghép được tính từ ngày ghép thực tế đã xác nhận.</p><div id="pairListLegacy"></div></div>
 <div class="card"><h3>Lịch chuẩn bị bán</h3><div id="saleList"></div></div>
 </section>
 
-<section id="chicks">
-<div class="card"><h3>Ghi nhận giao nuôi / theo dõi chim con</h3><form id="chickForm" onsubmit="saveForm(event,'chicks')">
+<section id="chicksLegacy" style="display:none">
+<div class="card"><h3>Ghi nhận giao nuôi / theo dõi chim con</h3><form id="chickFormLegacy" onsubmit="saveForm(event,'chicks')">
 <label>Ngày ghi nhận</label><input name="date" type="date" required><label>Mã tổ nhận nuôi</label><input name="nest" type="number" min="1" max="1800" required>
 <label>Số chim con</label><input name="count" type="number" min="0" required><label>Đánh giá</label><select name="quality"><option value="good">Nuôi tốt</option><option value="poor">Nuôi kém / cần theo dõi</option></select>
 <label>Tình trạng cần ghi nhận</label><select name="incident"><option value="">Không có sự cố</option><option value="weak">Chim con yếu / chậm lớn</option><option value="abandon">Bố mẹ bỏ nuôi / không mớm</option><option value="trample">Bố mẹ đạp chết chim con</option><option value="dead">Chim con chết</option><option value="other">Sự cố khác</option></select>
 <label>Số chim bị ảnh hưởng (nếu có)</label><input name="affected" type="number" min="0" value="0"><label>Cách xử lý / kết quả</label><textarea name="handling"></textarea><label>Ghi chú</label><textarea name="note"></textarea>
-<button class="save" id="chickSubmit">Lưu ghi nhận</button><button class="cancel hidden" id="chickCancel" type="button" onclick="cancelEdit('chicks')">Hủy sửa</button></form></div>
-<div class="card"><h3>Lịch sử nuôi con và sự cố</h3><div id="chickList"></div></div>
+<button class="save" id="chickSubmitLegacy">Lưu ghi nhận</button><button class="cancel hidden" id="chickCancelLegacy" type="button" onclick="cancelEdit('chicks')">Hủy sửa</button></form></div>
+<div class="card"><h3>Lịch sử nuôi con và sự cố</h3><div id="chickListLegacy"></div></div>
 </section>
 
 <section id="moves">
@@ -96,13 +91,19 @@ button{cursor:pointer}.save{background:var(--g);color:white;border:0;border-radi
 <label>Tổ mới</label><input name="to" type="number" min="1" max="1800" required><label>Số chim</label><input name="count" type="number" min="1" required>
 <label>Lý do / tình trạng chim khi chuyển</label><textarea name="note"></textarea><button class="save" id="moveSubmit">Lưu chuyển tổ</button><button class="cancel hidden" id="moveCancel" type="button" onclick="cancelEdit('moves')">Hủy sửa</button></form></div>
 <div class="card"><h3>Lịch sử chuyển tổ</h3><div id="moveList"></div></div>
+<div class="card"><h3>Ghi nhận tình trạng chim con tại tổ nhận nuôi</h3><form id="chickForm" onsubmit="saveForm(event,'chicks')">
+<label>Ngày ghi nhận</label><input name="date" type="date" required><label>Mã tổ đang nuôi</label><input name="nest" type="number" min="1" max="1800" required>
+<label>Số chim con hiện có</label><input name="count" type="number" min="0" required><label>Đánh giá nuôi con</label><select name="quality"><option value="good">Nuôi tốt</option><option value="poor">Nuôi kém / cần theo dõi</option></select>
+<label>Tình trạng</label><select name="incident"><option value="">Bình thường</option><option value="weak">Còi / yếu / ít sữa</option><option value="abandon">Bố mẹ bỏ nuôi / không mớm</option><option value="trample">Bị dẫm</option><option value="dead">Chim con chết</option><option value="other">Khác</option></select>
+<label>Số chim bị ảnh hưởng</label><input name="affected" type="number" min="0" value="0"><label>Nguyên nhân / cách xử lý</label><textarea name="handling"></textarea><label>Ghi chú</label><textarea name="note"></textarea>
+<button class="save" id="chickSubmit">Lưu tình trạng chim con</button><button class="cancel hidden" id="chickCancel" type="button" onclick="cancelEdit('chicks')">Hủy sửa</button></form><div id="chickList"></div></div>
 </section>
 
 <section id="coops">
 <div class="card"><h3>Danh sách ô chuồng</h3><p class="muted">Thảo được xem thông tin ô và ghi chú tình trạng. Không thay đổi mã ô hoặc trạng thái quản lý do chủ trại thiết lập.</p><label>Tìm mã ô</label><input id="coopSearchThao" inputmode="numeric" placeholder="Nhập mã ô, ví dụ 001" oninput="renderSharedMainData()"><div id="coopMirrorList"></div></div>
 </section>
 <section id="sales">
-<div class="card"><h3>Lịch bán và doanh thu – chỉ xem</h3><p class="muted">Lịch bán dự kiến 25–30 ngày được tính từ ngày ghép. Thảo không ghi sửa giao dịch bán hoặc đơn giá.</p><div id="salesMirrorList"></div></div>
+<div class="card"><h3>Lịch bán và doanh thu – chỉ xem</h3><p class="muted">Lịch bán dự kiến 25–28 ngày được tính từ ngày ghép. Thảo không ghi sửa giao dịch bán hoặc đơn giá.</p><div id="salesMirrorList"></div></div>
 </section>
 <section id="weights">
 <div class="card"><h3>Chim cần lọc và chăm riêng – dưới 500g</h3><p class="muted">Danh sách lấy từ lần cân mới nhất của App chính. Thảo dùng để kiểm tra và chăm riêng; việc xác nhận đạt chuẩn do chủ trại thực hiện.</p><div id="weightsMirrorList"></div></div>
@@ -139,10 +140,11 @@ function getForm(t){return $(t==="eggs"?"eggForm":t==="nests"?"nestForm":t==="ch
 function fields(f){let o={};new FormData(f).forEach((v,k)=>o[k]=v);return o}
 function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
 async function persist(){localSave();if(!ref||!ready)return;if(busy)return;busy=true;try{await cloud.runTransaction(async tx=>{await tx.get(ref);tx.set(ref,{thaoDB:{...db},updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})});setStatus("Đã đồng bộ dữ liệu")}catch(e){setStatus("Lỗi đồng bộ: "+e.message);console.error(e)}finally{busy=false}}
+function saveEggBatchThao(ev){ev.preventDefault();let f=$("eggForm"),d=fields(f),date=d.date,raw=(d.nestList||"").trim(),note=(d.note||"").trim(),eggType=d.eggType||"normal";if(!date||!raw)return;let parts=raw.split(/[\s,;]+/).filter(Boolean),rows=[];for(let part of parts){let m=part.match(/^(\d{1,4})(?:[:：=](\d+))?$/);if(!m){alert("Mã tổ không hợp lệ: "+part);return}let nest=Number(m[1]),count=Number(m[2]||1);if(!Number.isInteger(nest)||nest<1||nest>1800||!Number.isInteger(count)||count<1){alert("Mã tổ từ 1 đến 1800, số trứng phải từ 1 trở lên.");return}rows.push({nest,count})}if(editing.eggs!==undefined&&editing.eggs!==null){if(rows.length!==1){alert("Khi sửa một bản ghi, chỉ nhập một mã tổ.");return}let old=db.eggs[editing.eggs];Object.assign(old,{date,nest:rows[0].nest,count:rows[0].count,note,eggType});delete editing.eggs;}else rows.forEach(x=>db.eggs.unshift({id:newId(),date,nest:x.nest,count:x.count,note,eggType}));autoProposeIncubation();f.reset();f.elements.date.value=today();$("eggSubmit").textContent="Lưu danh sách trứng";$("eggCancel").classList.add("hidden");persist();render();}
 function saveForm(ev,type){ev.preventDefault();let f=getForm(type),d=fields(f),idx=editing[type];if(d.nest!==undefined&&(!Number.isInteger(Number(d.nest))||Number(d.nest)<1||Number(d.nest)>1800)){alert("Mã tổ phải từ 1 đến 1800");return}if(d.nest!==undefined)d.nest=Number(d.nest);if(d.count!==undefined)d.count=Number(d.count);if(d.affected!==undefined)d.affected=Number(d.affected);if(type==="moves"){d.from=Number(d.from);d.to=Number(d.to);d.count=Number(d.count);if(d.from===d.to){alert("Tổ cũ và tổ mới không được giống nhau");return}}if(type==="nests"){let duplicate=db.nests.some((x,i)=>x.active!==false&&x.approvalStatus!=="rejected"&&Number(x.nest)===d.nest&&i!==idx);if(duplicate){alert("Tổ này đã có trong danh sách, không tạo trùng");return}if(idx!==undefined&&idx!==null){let prior=db.nests[idx];d={...prior,...d,id:prior.id};}else{d.active=true;d.approvalStatus="pending";d.approvalSubmittedAt=new Date().toISOString();d.approvedAt=null;d.approvedBy="";d.approvalReason=""}}d.id=idx!==undefined&&idx!==null?db[type][idx].id:newId();if(idx!==undefined&&idx!==null)db[type][idx]=d;else db[type].unshift(d);delete editing[type];f.reset();let date=f.elements.namedItem("date");if(date)date.value=today();if(type==="eggs")autoProposeIncubation();persist();render();updateButtons(type)}
 function updateButtons(t){let p=t==="eggs"?"egg":t==="nests"?"nest":t==="chicks"?"chick":"move";$(p+"Submit").textContent=t==="eggs"?"Lưu trứng":t==="nests"?"Thêm tổ ấp":t==="chicks"?"Lưu ghi nhận":"Lưu chuyển tổ";$(p+"Cancel").classList.add("hidden")}
 function cancelEdit(t){editing[t]=null;let f=getForm(t);f.reset();let d=f.elements.namedItem("date");if(d)d.value=today();updateButtons(t)}
-function edit(t,id){let idx=db[t].findIndex(x=>x.id===id);if(idx<0)return;editing[t]=idx;let f=getForm(t);f.reset();Object.entries(db[t][idx]).forEach(([k,v])=>{let el=f.elements.namedItem(k);if(el)el.value=v??""});let p=t==="eggs"?"egg":t==="nests"?"nest":t==="chicks"?"chick":"move";$(p+"Submit").textContent="Cập nhật";$(p+"Cancel").classList.remove("hidden");f.scrollIntoView({behavior:"smooth"})}
+function edit(t,id){let idx=db[t].findIndex(x=>x.id===id);if(idx<0)return;if(t==='eggs'){let r=db.eggs[idx],f=getForm('eggs');editing.eggs=idx;f.elements.date.value=r.date||today();f.elements.nestList.value=String(r.nest)+':'+Number(r.count||1);f.elements.eggType.value=r.eggType||'normal';f.elements.note.value=r.note||'';$('eggSubmit').textContent='Cập nhật trứng';$('eggCancel').classList.remove('hidden');f.scrollIntoView({behavior:'smooth'});return;}editing[t]=idx;let f=getForm(t);f.reset();Object.entries(db[t][idx]).forEach(([k,v])=>{let el=f.elements.namedItem(k);if(el)el.value=v??""});let p=t==="eggs"?"egg":t==="nests"?"nest":t==="chicks"?"chick":"move";$(p+"Submit").textContent="Cập nhật";$(p+"Cancel").classList.remove("hidden");f.scrollIntoView({behavior:"smooth"})}
 async function remove(t,id){if(!confirm("Xóa bản ghi này?"))return;db[t]=db[t].filter(x=>x.id!==id);await persist();render()}
 function buttons(t,id){return `<div class="actions"><details><summary>⋯ Thao tác</summary><div class="menu"><button class="edit" onclick="edit('${t}','${id}')">Sửa</button><button class="del" onclick="remove('${t}','${id}')">Xóa</button></div></details></div>`}
 function item(title,lines,t,r){return `<div class="item"><b>${title}</b>${lines.map(x=>`<p>${x}</p>`).join("")}${buttons(t,r.id)}</div>`}
@@ -150,7 +152,7 @@ function taskStatus(t){if(t.done)return ["Đã hoàn thành","green"];return t.d
 function saveTask(ev){ev.preventDefault();let f=$("taskForm"),d=fields(f);d.id=newId();d.done=false;d.createdAt=new Date().toISOString();d.nest=d.nest?Number(d.nest):"";db.tasks.unshift(d);f.reset();f.elements.date.value=today();persist();render()}
 async function toggleTask(id){let t=db.tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;t.doneAt=t.done?today():"";await persist();render()}
 async function deleteTask(id){if(!confirm("Xóa công việc này?"))return;db.tasks=db.tasks.filter(x=>x.id!==id);await persist();render()}
-function generatedTasks(){let a=[];let now=today();(mainDBMirror?.pairings||[]).forEach(p=>{let d=p.pairedDate||p.confirmedDate||p.actualPairDate||p.date;if(!d||p.confirmed===false||p.status==="planned"||p.status==="pending")return;let nests=Array.isArray(p.slots)?p.slots:[p.nest??p.nestId??p.coop].filter(Boolean);nests.forEach(nest=>{[3,5].forEach(day=>{let due=datePlus(d,day),key="paircheck_"+(p.id||nest+"_"+d)+"_"+nest+"_"+day;if(due<=now&&!db.tasks.some(t=>t.autoKey===key))a.push({id:key,autoKey:key,title:`Kiểm tra sau ghép ngày ${day} – tổ ${nestFmt(nest)}`,date:due,nest:Number(nest),priority:day===5?"high":"normal",done:false,auto:true,note:"Kiểm tra bố mẹ có mớm, bỏ nuôi hoặc đạp chim con không"});});});});return a}
+function generatedTasks(){let a=[];let now=today();(mainDBMirror?.pairings||[]).forEach(p=>{let d=p.pairedDate||p.confirmedDate||p.actualPairDate||p.date;if(!d||p.confirmed===false||p.status==="planned"||p.status==="pending")return;let nests=Array.isArray(p.slots)?p.slots:[p.nest??p.nestId??p.coop].filter(Boolean);nests.forEach(nest=>{[1,3,5,6,10].forEach(day=>{let due=datePlus(d,day),key="paircheck_"+(p.id||nest+"_"+d)+"_"+nest+"_"+day;if(due<=now&&!db.tasks.some(t=>t.autoKey===key))a.push({id:key,autoKey:key,title:`Kiểm tra sau ghép ngày ${day} – tổ ${nestFmt(nest)}`,date:due,nest:Number(nest),priority:day===5?"high":"normal",done:false,auto:true,note:"Kiểm tra bố mẹ có mớm, bỏ nuôi hoặc đạp chim con không"});});});});return a}
 function renderTasks(){let all=[...generatedTasks(),...db.tasks],filter=$("taskDate").value||today();let html=all.filter(t=>t.date===filter||t.done&&t.date===filter).sort((a,b)=>a.date.localeCompare(b.date)).map(t=>{let [s,c]=taskStatus(t);return `<div class="item"><b>${safe(t.title)}</b><p>Ngày: ${fmt(t.date)} ${t.nest? " · Tổ "+nestFmt(t.nest):""}</p><span class="pill ${c}">${s}</span>${t.note?`<p>${safe(t.note)}</p>`:""}${t.auto?'<p class="muted">Nhắc tự động từ lịch ghép thực tế</p>':""}<div class="actions"><button class="edit" onclick="toggleTask('${t.id}')">${t.done?"Mở lại":"Đánh dấu hoàn thành"}</button>${!t.auto?`<button class="del" onclick="deleteTask('${t.id}')">Xóa</button>`:""}</div></div>`}).join("");$("taskList").innerHTML=html||"<p>Không có công việc trong ngày này.</p>"}
 function saveDailyReport(){let date=$("reportDate").value||today(),note=$("reportNote").value.trim(),old=db.reports.find(x=>x.date===date);if(old){old.note=note;old.updatedAt=new Date().toISOString()}else db.reports.unshift({id:newId(),date,note,updatedAt:new Date().toISOString()});persist();render();alert("Đã lưu báo cáo cuối ngày")}
 function renderReports(){$("reportHistory").innerHTML=db.reports.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(r=>`<div class="item"><b>Báo cáo ${fmt(r.date)}</b><p>${safe(r.note||"Không có ghi chú")}</p></div>`).join("")}
@@ -175,15 +177,15 @@ function renderPairs(){
  });
  $("pairList").innerHTML=expanded.length?expanded.sort((a,b)=>String(b._displayDate).localeCompare(String(a._displayDate))||String(a._displayNest).localeCompare(String(b._displayNest),"en",{numeric:true})).map(r=>{
   const d=r._displayDate,n=r._displayNest,confirmed=r.confirmed!==false&&r.status!=="planned"&&r.status!=="pending";
-  const check=d&&confirmed?`<p>Kiểm tra ngày 3–5: ${fmt(datePlus(d,3))} đến ${fmt(datePlus(d,5))}</p>`:"<p>Chưa xác nhận ghép thực tế – chưa bắt đầu đếm lịch kiểm tra</p>";
+  const age=d?Math.floor((new Date(today()+"T12:00:00")-new Date(d+"T12:00:00"))/86400000):0;const stage=age>=6&&age<=10?"Ưu tiên kiểm tra nhóm ngày 6–10":age>=3&&age<=5?"Kiểm tra nhóm ngày 3–5":age>=1&&age<=4?"Theo dõi nhóm ngày 1–4":"Chưa đến nhóm kiểm tra";const tone=age>=6&&age<=10?"red":age>=1&&age<=5?"yellow":"blue";const check=d&&confirmed?`<p>Nhắc: ${fmt(datePlus(d,3))}–${fmt(datePlus(d,5))} (ngày 3–5) · ${fmt(datePlus(d,6))}–${fmt(datePlus(d,10))} (ngày 6–10)</p><span class="pill ${tone}">${stage}</span>`:"<p>Chưa xác nhận ghép thực tế – chưa bắt đầu đếm lịch kiểm tra</p>";
   const qty=r._displayBirds===null?"Chưa phân bổ số con theo tổ":`Số con ghép: ${r._displayBirds}`;
   return `<div class="item"><b>Tổ ${nestFmt(n||0)}</b><p>Ngày ghép: ${fmt(d)}</p><p>${qty}</p><span class="pill ${confirmed?"green":"yellow"}">${confirmed?"Đã xác nhận ghép":"Chờ xác nhận"}</span>${check}${r.note?`<p>Ghi chú: ${safe(r.note)}</p>`:""}</div>`
  }).join(""):"<p>Chưa nhận được lịch ghép từ App chính.</p>";
 }
-function renderSales(){let p=getMainPairs().filter(r=>r.pairedDate||r.confirmedDate||r.actualPairDate||r.date),rows=[];p.forEach(r=>{let d=r.pairedDate||r.confirmedDate||r.actualPairDate||r.date,slots=Array.isArray(r.slots)?r.slots:[r.nest??r.nestId??r.coop??""],counts=r.slotBirdCounts||r.birdsBySlot||{};slots.forEach(n=>{let key=String(n).padStart(3,"0"),known=Object.prototype.hasOwnProperty.call(counts,key)||slots.length===1,qty=known?Number(counts[key]??r.birds??0):null,sell1=datePlus(d,25),sell2=datePlus(d,30),left=Math.ceil((new Date(sell1+"T12:00:00")-new Date(today()+"T12:00:00"))/86400000);rows.push(`<div class="item"><b>Tổ ${nestFmt(n||0)}</b><p>Ngày ghép: ${fmt(d)} · ${qty===null?"Số con chưa phân bổ":qty+" con"}</p><p>Dự kiến bán: ${fmt(sell1)} – ${fmt(sell2)}</p><span class="pill ${left<=0?"yellow":"blue"}">${left>0?"Còn "+left+" ngày đến mốc 25 ngày":"Đến hoặc quá mốc bán dự kiến"}</span></div>`)});});$("saleList").innerHTML=rows.join("")||"Chưa có lịch bán."}
-function renderEggAnalytics(){let day=$("eggDay").value||today(),month=$("eggMonth").value||today().slice(0,7),rows=db.eggs.filter(x=>x.date===day),total=rows.reduce((s,x)=>s+Number(x.count||1),0),nests=new Set(rows.map(x=>Number(x.nest))).size,two=rows.filter(x=>Number(x.count)===2).length;$("eggDaySummary").innerHTML=`<div>Trứng nhặt trong ngày<b>${total}</b></div><div>Số tổ có trứng<b>${nests}</b></div><div>Lượt tổ có 2 trứng<b>${two}</b></div><div>Lượt ghi nhận<b>${rows.length}</b></div>`;$("eggDayDetails").innerHTML=rows.length?`<h4>Chi tiết tổ trong ngày</h4>`+rows.slice().sort((a,b)=>a.nest-b.nest).map(x=>`<p>Tổ ${nestFmt(x.nest)}: <b>${x.count} quả</b> ${x.note?"· "+safe(x.note):""}</p>`).join(""):"<p>Ngày này chưa ghi nhận trứng.</p>";
+function renderSales(){let p=getMainPairs().filter(r=>r.pairedDate||r.confirmedDate||r.actualPairDate||r.date),rows=[];p.forEach(r=>{let d=r.pairedDate||r.confirmedDate||r.actualPairDate||r.date,slots=Array.isArray(r.slots)?r.slots:[r.nest??r.nestId??r.coop??""],counts=r.slotBirdCounts||r.birdsBySlot||{};slots.forEach(n=>{let key=String(n).padStart(3,"0"),known=Object.prototype.hasOwnProperty.call(counts,key)||slots.length===1,qty=known?Number(counts[key]??r.birds??0):null,sell1=datePlus(d,25),sell2=datePlus(d,28),left=Math.ceil((new Date(sell1+"T12:00:00")-new Date(today()+"T12:00:00"))/86400000);rows.push(`<div class="item"><b>Tổ ${nestFmt(n||0)}</b><p>Ngày ghép: ${fmt(d)} · ${qty===null?"Số con chưa phân bổ":qty+" con"}</p><p>Dự kiến bán: ${fmt(sell1)} – ${fmt(sell2)}</p><span class="pill ${left<=0?"yellow":"blue"}">${left>0?"Còn "+left+" ngày đến mốc 25 ngày":"Đến hoặc quá mốc bán dự kiến"}</span></div>`)});});$("saleList").innerHTML=rows.join("")||"Chưa có lịch bán."}
+function renderEggAnalytics(){let day=$("eggDay").value||today(),month=$("eggMonth").value||today().slice(0,7),rows=db.eggs.filter(x=>x.date===day),total=rows.reduce((s,x)=>s+Number(x.count||1),0),nests=new Set(rows.map(x=>Number(x.nest))).size,two=rows.filter(x=>Number(x.count)===2).length;$("eggDaySummary").innerHTML=`<div>Trứng nhặt trong ngày<b>${total}</b><small>Trắng/phôi ${rows.filter(x=>x.eggType==='white').reduce((n,x)=>n+Number(x.count||1),0)} · Chết lắc ${rows.filter(x=>x.eggType==='dead').reduce((n,x)=>n+Number(x.count||1),0)}</small></div><div>Số tổ có trứng<b>${nests}</b></div><div>Lượt tổ có 2 trứng<b>${two}</b></div><div>Lượt ghi nhận<b>${rows.length}</b></div>`;$("eggDayDetails").innerHTML=rows.length?`<h4>Chi tiết tổ trong ngày</h4>`+rows.slice().sort((a,b)=>a.nest-b.nest).map(x=>`<p>Tổ ${nestFmt(x.nest)}: <b>${x.count} quả</b> ${x.note?"· "+safe(x.note):""}</p>`).join(""):"<p>Ngày này chưa ghi nhận trứng.</p>";
 let mr=db.eggs.filter(x=>(x.date||"").slice(0,7)===month),mt=mr.reduce((s,x)=>s+Number(x.count||1),0),byDay={};mr.forEach(x=>byDay[x.date]=(byDay[x.date]||0)+Number(x.count||1));$("eggMonthSummary").innerHTML=`<p><b>${mt} quả</b> trong ${month} · ${new Set(mr.map(x=>x.date)).size} ngày có nhặt trứng</p>`+Object.keys(byDay).sort().reverse().map(d=>`<p>${fmt(d)}: <b>${byDay[d]} quả</b></p>`).join("")}
-function renderGroupedEggs(){let groups={};db.eggs.forEach(r=>{let k=Number(r.nest);(groups[k]??=[]).push(r)});let keys=Object.keys(groups).sort((a,b)=>Number(a)-Number(b));$("eggList").innerHTML=keys.length?keys.map(k=>{let rows=groups[k].slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))),total=rows.reduce((n,r)=>n+Number(r.count||1),0),dates=[...new Set(rows.map(r=>r.date).filter(Boolean))].sort(),dateText=dates.map(fmt).join(" · ");return `<div class="item"><b>Tổ ${nestFmt(k)}</b><p><b>${total} quả</b> · ${dateText||"Chưa rõ ngày"}</p><details><summary>Xem ${rows.length} lần ghi nhận và chỉnh sửa</summary>${rows.map(r=>`<div class="item"><p>Ngày ${fmt(r.date)} · <b>${Number(r.count||1)} quả</b></p>${r.note?`<p>${safe(r.note)}</p>`:""}${buttons("eggs",r.id)}</div>`).join("")}</details></div>`}).join(""):"<p>Chưa có dữ liệu trứng.</p>"}
+function renderGroupedEggs(){let groups={};db.eggs.forEach(r=>{let k=Number(r.nest);(groups[k]??=[]).push(r)});let keys=Object.keys(groups).sort((a,b)=>Number(a)-Number(b));$("eggList").innerHTML=keys.length?keys.map(k=>{let rows=groups[k].slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))),total=rows.reduce((n,r)=>n+Number(r.count||1),0),dates=[...new Set(rows.map(r=>r.date).filter(Boolean))].sort(),dateText=dates.map(fmt).join(" · ");return `<div class="item"><b>Tổ ${nestFmt(k)}</b><p><b>${total} quả</b> · ${dateText||"Chưa rõ ngày"}</p><details><summary>Xem ${rows.length} lần ghi nhận và chỉnh sửa</summary>${rows.map(r=>`<div class="item"><p>Ngày ${fmt(r.date)} · <b>${Number(r.count||1)} quả</b> · ${r.eggType==='white'?'Trắng/phôi':r.eggType==='dead'?'Chết lắc':'Bình thường'}</p>${r.note?`<p>${safe(r.note)}</p>`:""}${buttons("eggs",r.id)}</div>`).join("")}</details></div>`}).join(""):"<p>Chưa có dữ liệu trứng.</p>"}
 function moneyV(n){return Number(n||0).toLocaleString("vi-VN")+"đ"}
 async function saveCoopNote(coop){let el=$("coopnote_"+coop);if(!el)return;let row=(db.coopNotes||[]).find(x=>String(x.coop)===String(coop));if(row){row.note=el.value.trim();row.updatedAt=new Date().toISOString()}else{db.coopNotes=db.coopNotes||[];db.coopNotes.unshift({id:newId(),coop:String(coop),note:el.value.trim(),updatedAt:new Date().toISOString()})}await persist();alert("Đã lưu ghi chú ô "+coop)}
 function renderSharedMainData(){
@@ -191,7 +193,7 @@ function renderSharedMainData(){
  const unavailable='<p class="muted">Chưa có bản sao dữ liệu từ App chính. Mục này sẽ tự hiện dữ liệu sau khi App chính chia sẻ bản đọc cho App Thảo; không tự truy cập hoặc sửa dữ liệu riêng của chủ trại.</p>';
  let q=( $("coopSearchThao")?.value||"").replace(/^0+/,"");let cf=coops.filter(c=>!q||String(c.id||c.slot||"").replace(/^0+/,"").includes(q));
  $("coopMirrorList").innerHTML=mainDBMirror?(cf.slice(0,150).map(c=>{let id=String(c.id||c.slot||""),note=(db.coopNotes||[]).find(n=>String(n.coop)===id);return `<div class="item"><b>Ô ${safe(id)}</b><p>Trạng thái: ${safe(c.status||"Chưa cập nhật")}</p>${c.parents?`<p>Cặp bố mẹ: ${safe(c.parents)}</p>`:""}<label>Ghi chú tình trạng ô</label><textarea id="coopnote_${safe(id)}" placeholder="Ghi chú vệ sinh, hỏng hóc, cần kiểm tra...">${safe(note?.note||"")}</textarea><button class="save" type="button" onclick="saveCoopNote('${safe(id)}')">Lưu ghi chú</button></div>`}).join("")||"<p>Không tìm thấy ô phù hợp.</p>") : unavailable;
- let pairRows=pairs.map(p=>{let d=p.pairedDate||p.confirmedDate||p.actualPairDate||p.date;if(!d)return "";let nest=p.nest??p.nestId??p.coop??(Array.isArray(p.slots)?p.slots.join(", "):"");let from=datePlus(d,25),to=datePlus(d,30),qty=Math.max(0,Number(p.birds||0)-Number(p.soldQty||0));return `<div class="item"><b>Đợt ghép · Tổ ${safe(nest||"—")}</b><p>Ngày ghép: ${fmt(d)} · Dự kiến bán: ${fmt(from)} – ${fmt(to)}</p><p>Số chim dự kiến còn: ${qty}</p></div>`}).join("");
+ let pairRows=pairs.map(p=>{let d=p.pairedDate||p.confirmedDate||p.actualPairDate||p.date;if(!d)return "";let nest=p.nest??p.nestId??p.coop??(Array.isArray(p.slots)?p.slots.join(", "):"");let from=datePlus(d,25),to=datePlus(d,28),qty=Math.max(0,Number(p.birds||0)-Number(p.soldQty||0));return `<div class="item"><b>Đợt ghép · Tổ ${safe(nest||"—")}</b><p>Ngày ghép: ${fmt(d)} · Dự kiến bán: ${fmt(from)} – ${fmt(to)}</p><p>Số chim dự kiến còn: ${qty}</p></div>`}).join("");
  let saleRows=sales.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).map(x=>`<div class="item"><b>Giao dịch ${fmt(x.date)}</b><p>Loại ${safe(x.grade||x.type||"—")} · ${Number(x.qty||x.count||0)} con · ${moneyV(x.amount||Number(x.qty||0)*Number(x.price||0))}</p><p>${safe(x.note||"")}</p></div>`).join("");
  $("salesMirrorList").innerHTML=mainDBMirror?(pairRows+saleRows||"<p>Chưa có lịch ghép hoặc giao dịch bán.</p>") : unavailable;
  let latest=new Map();weights.forEach(w=>{let k=w.birdId||w.code||w.id,old=latest.get(k);if(!old||String(w.date)>String(old.date))latest.set(k,w)});
@@ -223,16 +225,20 @@ function autoProposeIncubation(){
  let groups={};db.eggs.forEach(e=>{let n=Number(e.nest);(groups[n]??=[]).push(e)});
  let made=false;
  Object.entries(groups).forEach(([nest,rows])=>{
-  let total=rows.reduce((n,x)=>n+Number(x.count||1),0);if(total<2)return;
-  if(db.nests.some(x=>Number(x.nest)===Number(nest)&&x.active!==false&&x.approvalStatus!=="rejected"))return;
-  let ids=rows.map(x=>x.id||`${x.date}_${x.count}`).sort(),cycleKey=`${nest}|${ids.join("|")}`;
-  if(db.nests.some(x=>x.autoCycleKey===cycleKey))return;
-  let latest=rows.map(x=>x.date||"").sort().slice(-1)[0]||today();
-  let last=db.nests.filter(x=>Number(x.nest)===Number(nest)).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0];
-  if(last&&last.approvalStatus==="rejected"&&latest<=String(last.date||today()))return;if(last&&last.active===false&&last.endDate&&latest<=last.endDate)return;
-  db.nests.unshift({id:newId(),date:latest,nest:Number(nest),priority:"yes",quality:"good",note:`Tự đề xuất vì đã ghi nhận ${total} trứng`,active:true,approvalStatus:"pending",approvalSubmittedAt:new Date().toISOString(),approvedAt:null,approvedBy:"",approvalReason:"",autoGenerated:true,autoCycleKey:cycleKey,eggCount:total});made=true;
+  rows.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+  let cycles=[];rows.forEach(r=>{let c=cycles[cycles.length-1],d=String(r.date||'');if(!c||!c.last||!d||Math.abs((new Date(d+'T12:00:00')-new Date(c.last+'T12:00:00'))/86400000)>2){c={rows:[],last:d};cycles.push(c)}c.rows.push(r);if(d)c.last=d;});
+  cycles.forEach(c=>{let normalRows=c.rows.filter(x=>!x.eggType||x.eggType==='normal'),total=normalRows.reduce((n,x)=>n+Number(x.count||1),0);if(total<2)return;
+   let ids=normalRows.map(x=>x.id||`${x.date}_${x.count}`).sort(),cycleKey=`${nest}|${ids.join('|')}`;
+   if(db.nests.some(x=>x.autoCycleKey===cycleKey))return;
+   let latest=normalRows.map(x=>x.date||'').sort().slice(-1)[0]||today();
+   let active=db.nests.some(x=>Number(x.nest)===Number(nest)&&x.active!==false&&x.approvalStatus!=='rejected'&&String(x.date||'')>=String(normalRows[0].date||''));
+   if(active)return;
+   let last=db.nests.filter(x=>Number(x.nest)===Number(nest)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0];
+   if(last&&last.approvalStatus==='rejected'&&latest<=String(last.date||today()))return;
+   db.nests.unshift({id:newId(),date:latest,nest:Number(nest),priority:'yes',quality:'good',note:`Tự đề xuất vì đã ghi nhận ${total} trứng`,active:true,approvalStatus:'pending',approvalSubmittedAt:new Date().toISOString(),approvedAt:null,approvedBy:'',approvalReason:'',autoGenerated:true,autoCycleKey:cycleKey,eggCount:total});made=true;
+  });
  });
- if(made)setStatus("Đã tự tạo đề xuất ấp cho tổ đủ 2 trứng – chờ Thảo duyệt hoặc không duyệt");
+ if(made)setStatus('Đã tự tạo đề xuất ấp cho tổ đủ 2 trứng – chờ duyệt');
 }
 function listNestPairs(nest){return getMainPairs().filter(p=>{let slots=Array.isArray(p.slots)?p.slots:[];return slots.some(x=>Number(String(x).replace(/^0+/,''))===Number(nest))||Number(p.nest??p.nestId??p.coop)===Number(nest)})}
 function renderNestProfile(){let raw=$("profileNest")?.value;if(!raw){$("nestProfile").innerHTML="<p class='muted'>Nhập mã tổ để xem hồ sơ tổng hợp.</p>";return}let nest=Number(raw);if(!Number.isInteger(nest)||nest<1||nest>1800){$("nestProfile").innerHTML="<p>Mã tổ không hợp lệ.</p>";return}
